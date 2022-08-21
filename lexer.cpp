@@ -20,4 +20,32 @@ enum Token {
 	tok_number = -9
 };
 
-int 
+struct Lexicon {
+	Token token;
+	int value;	// only used if the token is tok_number
+};
+
+static enum State {
+	init, move_or_turn, not_move_or_turn, control_or_blocked, not_state, number 
+};
+
+std::vector<Lexicon> LexerOutputs;
+
+Lexicon getTok() {
+	static int LastChar = ' ';
+	static State current_state = init;
+	int value = 0;
+
+	while(isspace(LastChar))
+		LastChar = getchar(); 
+	
+	if (LastChar == 0xE2) {
+		if (current_state == init) {
+				state = move_or_turn;
+	}
+
+	int ThisChar = LastChar;
+	Lexicon output = {getchar(), 0};
+	return output;
+}
+
