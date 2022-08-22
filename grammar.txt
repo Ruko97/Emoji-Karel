@@ -6,6 +6,7 @@ action ::= ➡
 block ::= action+
 
 numberexpr ::= tok_number
+            | '(' number ')'
 
 conditional ::= 🧱 
 	     |  🚫 conditional
