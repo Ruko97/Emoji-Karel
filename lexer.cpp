@@ -2,7 +2,7 @@
 #include <cctype>
 #include <vector>
 #include <cassert>
-#include "lexer.h"
+#include "lexer.hpp"
 
 // Returns a 4-byte integer representing the unicode value of the next character
 static int getNextUnicode() {
