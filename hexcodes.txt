@@ -1,3 +1,7 @@
+NOTE: for move() and turnleft(), might only choose to use the first 3 bytes,
+since those bytes indicate the arrow sign (the remaining 3 indicate the blue
+box in the background)
+
 move(): ➡️ Hexcode - 0xE2 0x9E 0xA1 0xEF 0xB8 0x8F
 turnLeft(): ↩️ Hexcode - 0xE2 0x86 0xA9 0xEF 0xB8 0x8F
 if: 🤔 0xF0 0x9F 0xA4 0x94
