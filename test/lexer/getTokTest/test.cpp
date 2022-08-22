@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 
 	int currentToken;
 
-	for (int i = 0; i < currentToken; i++) {
+	for (int i = 0; i < outputLen; i++) {
 		currentToken = getTok();
 		assert(currentToken == expectedOutput[i]); 
 	}
