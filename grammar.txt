@@ -8,11 +8,16 @@ block ::= action+
 numberexpr ::= tok_number
             | '(' number ')'
 
-conditional ::= 🧱 
-	     |  🚫 conditional
-	     |  conditional '&' conditional
-	     |  conditional '|' conditional
-	     |  '(' conditional ')'
+notexpr ::= 🚫 conditional
+frontblkexpr ::= 🧱
+
+conditional ::= frontblkexpr 
+	     | notexpr
+	     | binarycond
+	     | '(' conditional ')'
+
+binarycond ::= conditional '&' conditional
+	    |  conditional '|' conditional
 
 matchedif ::= 🤔 conditional '{' matchedif '}' 🙁 '{' matchedif '}' 
 	   |  block
