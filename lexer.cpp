@@ -2,27 +2,10 @@
 #include <cctype>
 #include <vector>
 #include <cassert>
-
-enum Token {
-	tok_eof = -1,
-
-	tok_move = -2,
-	tok_turn_left = -3,
-
-	tok_if = -4,
-	tok_else = -5,
-
-	tok_for = -6,
-
-	tok_not = -7,
-
-	tok_front_blocked = -8,
-
-	tok_number = -9
-};
+#include "lexer.h"
 
 // Returns a 4-byte integer representing the unicode value of the next character
-int getNextUnicode() {
+static int getNextUnicode() {
 	int output = 0;
 	int thisChar = getchar();
 	
@@ -54,12 +37,41 @@ int getNextUnicode() {
 	return output;
 }
 
-int main() {
-	int output;
-	while (true) {
-		output = getNextUnicode();
-		if (output == EOF) break;
-		printf("0x%X\n", output);
+// This contains the numeric value of a integer if getTok == tok_number
+int numVal;
+
+int getTok() {
+	int thisChar = getNextUnicode();
+	
+	while(isspace(thisChar))
+		thisChar = getNextUnicode();
+	
+	if (thisChar == EOF)
+		return Token::tok_eof;
+		
+	if (isdigit(thisChar)) {
+		numVal = 0;
+		do {
+			numVal = numVal * 10 + (thisChar - '0');
+			thisChar = getNextUnicode();
+		} while (isdigit(thisChar));
+		
+		return Token::tok_number;
 	}
-	return 0;
+	
+	if (thisChar == '#') {
+		// Comment until end of line.
+		do thisChar = getchar();
+		while (thisChar != EOF && thisChar != '\n' && thisChar != '\r');
+		
+		if (thisChar != EOF) return getTok();
+	}
+	
+	if (thisChar == 0x27A1) return Token::tok_move;
+	if (thisChar == 0x21A9) return Token::tok_turn_left;
+	if (thisChar == 0x1F914) return Token::tok_if;
+	if (thisChar == 0x1F641) return Token::tok_else;
+	if (thisChar == 0x1F504) return Token::tok_while;
+	if (thisChar == 0x1F6AB) return Token::tok_not;
+	if (thisChar == 0x1F9F1) return Token::tok_front_blocked;
 }
