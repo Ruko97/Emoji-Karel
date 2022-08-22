@@ -1,0 +1,27 @@
+action ::= ➡ 
+	|  ↩
+	|  ifstmt
+	|  whilestmt
+
+block ::= action+
+
+numberexpr ::= tok_number
+
+conditional ::= 🧱 
+	     |  🚫 conditional
+	     |  conditional '&' conditional
+	     |  conditional '|' conditional
+	     |  '(' conditional ')'
+
+matchedif ::= 🤔 conditional '{' matchedif '}' 🙁 '{' matchedif '}' 
+	   |  block
+openif    ::= 🤔 conditional'{' block '}'
+	   |  🤔 conditional '{' matchedif '} 🙁 '{' openif '}'
+
+ifstmt ::= matchedif
+	|  openif
+
+whilestmt ::= 🔄 condition '{' block '}'
+	   |  🔄 numberexpr '{' block '}'
+
+program ::= block
