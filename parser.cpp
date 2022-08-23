@@ -3,31 +3,7 @@
 #include <map>
 #include "ast.hpp"
 #include "lexer.hpp"
-
-/// CurTok/getNextToken - Provides a simple token buffer. CurTok is the current
-/// token the parser is looking at.  getNextToken reads another token from the
-/// lexer and updates CurTok with its results
-static int CurTok;
-static int getNextToken() { return CurTok = getTok(); }
-
-/// BinopPrecedence - holds the precendence for each binary operation that is defined
-static std::map<char, int> BinopPrecedence;
-
-/// GetTokPrecedence - Get the precedence of the pending binary operator token
-static int GetTokPrecedence() {
-	if (!isascii(CurTok)) return -1;
-
-	// Make sure it's a declared binop
-	int TokPrec = BinopPrecedence[CurTok];
-	if (TokPrec <= 0) return -1;
-
-	return TokPrec;
-}
-
-/// LogError* - These are little helper functions for error handling
-static std::unique_ptr<ExprAST> LogError(const char *Str) {
-	fprintf(stderr, "Error: %s\n", Str);
-}
+#include "parser.hpp"
 
 /// movementstmt ::= ➡ 
 ///               |  ↩
@@ -60,7 +36,7 @@ static std::unique_ptr<ExprAST> ParseNot() {
 	if (CurTok != Token::tok_not) return LogError("Expected 🚫");
 	getNextToken();	// consume 🚫
 	
-	auto Cond = parseCond();
+	auto Cond = ParseCond();
 	if (!Cond) return nullptr;
 	
 	return std::make_unique<NotExprAST>(std::move(Cond));
@@ -72,18 +48,18 @@ static std::unique_ptr<ExprAST> ParseNot() {
 /// 		  |  binarycond
 static std::unique_ptr<ExprAST> ParseCond() {
 	switch (CurTok) {
-		case Token::tok_front_blocked:
-			return ParseFrontBlocked();
-		case Token::tok_not:
-			return ParseNot();
-		case '(':
-			getNextToken();	// consume '('
-			auto Cond = ParseCond();
-			if (CurTok != ')') return LogError("Expected ')'");
-			getNextToken();	// consume ')'
-			return std::make_unique<CondAST>(std::move(Cond));
-		default:
-			return ParseBinaryCond();
+	default:
+		return ParseBinaryCond();
+	case Token::tok_front_blocked:
+		return ParseFrontBlocked();
+	case Token::tok_not:
+		return ParseNot();
+	case '(':
+		getNextToken();	// consume '('
+		std::unique_ptr<ExprAST> Cond = ParseCond();
+		if (CurTok != ')') return LogError("Expected ')'");
+		getNextToken();	// consume ')'
+		return std::make_unique<CondAST>(std::move(Cond));
 	}
 }
 
@@ -95,8 +71,8 @@ static std::unique_ptr<ExprAST> ParseBinaryCond() {
 }
 
 /// binoprhs ::= ('&' cond)*
-static std::unique_ptr<ExprAST> 
-ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS) {
+static std::unique_ptr<ExprAST> ParseBinOpRHS(
+		int ExprPrec, std::unique_ptr<ExprAST> LHS) {
 	while (true) {
 		int TokPrec = GetTokPrecedence();
 		
@@ -170,18 +146,17 @@ static std::unique_ptr<ExprAST> ParseLoop() {
 	if (CurTok != '(') return LogError("Expected '('");
 	getNextToken();	// consume '('
 	
-	union {
-		std::unique_ptr<ExprAST> Cond;
-		int count;
-	} loopCond;
+	// TODO: need to put these two variables in a union instead to save memory
+	std::unique_ptr<ExprAST> Cond;	// used only in while loops
+	int count;						// used only in for loops
 	
 	if (CurTok == tok_number) {
-		loopCond.count = numVal;
+		count = numVal;
 		getNextToken();	// consume the number
 	}
 	else {
-		loopCond.Cond = ParseCond();
-		if (!loopCond.Cond) return nullptr;
+		Cond = ParseCond();
+		if (!Cond) return nullptr;
 	}
 
 	if (CurTok != ')') return LogError("Expected ')'");
@@ -197,9 +172,9 @@ static std::unique_ptr<ExprAST> ParseLoop() {
 	getNextToken(); // consume '}'
 	
 	if (CurTok == tok_number)
-		return std::make_unique<ForLoopAST>(loopCond.count, std::move(Body)); 
+		return std::make_unique<ForLoopAST>(count, std::move(Body)); 
 	else
-		return std::make_unique<WhileLoopAST>(loopCond.Cond, std::move(Body));
+		return std::make_unique<WhileLoopAST>(std::move(Cond), std::move(Body));
 }
 
 /// action ::= movementstmt 
@@ -222,23 +197,23 @@ static std::unique_ptr<ExprAST> ParseAction() {
 static std::unique_ptr<ExprAST> ParseBlock() {
 	std::vector<std::unique_ptr<ExprAST>> actions;
 		
-	auto Action = ParseAction();
+	std::unique_ptr<ExprAST> Action = ParseAction();
 	if (!Action) return nullptr;
 	
-	actions.push_back(Action);
+	actions.push_back(std::move(Action));
 	
 	while (CurTok == tok_move || CurTok == tok_turn_left 
 			|| CurTok == tok_if || CurTok == tok_while) {
 		Action = ParseAction();
 		if (!Action) return nullptr;
-		actions.push_back(Action);
+		actions.push_back(std::move(Action));
 	}
 	
 	return std::make_unique<BlockAST>(std::move(actions));
 }
 
 /// program ::= block
-static std::unique_ptr<ExprAST> ParseProgram() {
+std::unique_ptr<ExprAST> ParseProgram() {
 	if (auto B = ParseBlock()) 
 		return std::make_unique<ProgramAST>(std::move(B));
 	else 

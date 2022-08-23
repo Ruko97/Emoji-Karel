@@ -5,7 +5,7 @@
 #include "lexer.hpp"
 
 enum Movement {
-	move = Token::tok_move, turn_left = Token::turn_left
+	move = Token::tok_move, turn_left = Token::tok_turn_left
 };
 
 /// ExprAST - Base class for all expression nodes
@@ -16,10 +16,10 @@ public:
 
 /// MovementAST - Represents an movement, either move or turn left
 class MovementAST : public ExprAST {
-	Movement action;
+	Movement movement;
 	
 public:
-	ActionAST(Movement movement) : movement(movement) {}
+	MovementAST(Movement movement) : movement(movement) {}
 };
 
 /// FrontBlockedAST - Indicating front blocked
@@ -97,7 +97,7 @@ class BlockAST : public ExprAST {
 	
 public:
 	BlockAST(std::vector<std::unique_ptr<ExprAST>> actions) 
-		: expressions(std::move(actions)) {}
+		: actions(std::move(actions)) {}
 };
 
 /// ProgramAST - AST representing a program
