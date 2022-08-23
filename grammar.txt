@@ -5,9 +5,6 @@ action ::= ➡
 
 block ::= action+
 
-numberexpr ::= tok_number
-            | '(' numberexpr ')'
-
 notexpr ::= 🚫 conditional
 frontblkexpr ::= 🧱
 
@@ -21,15 +18,15 @@ binarycond ::= conditional '&' conditional
 
 NOTE: THERE IS PROBABILITY THAT WE MIGHT NOT NEED MATCHEDIF & OPENIF
 
-matchedif ::= 🤔 conditional '{' matchedif '}' 🙁 '{' matchedif '}' 
+matchedif ::= 🤔 '(' conditional ')' '{' matchedif '}' 🙁 '{' matchedif '}' 
 	   |  block
-openif    ::= 🤔 conditional'{' block '}'
-	   |  🤔 conditional '{' matchedif '}' 🙁 '{' openif '}'
+openif    ::= 🤔 '(' conditional ')' '{' block '}'
+	   |  🤔 '(' conditional ')' '{' matchedif '}' 🙁 '{' openif '}'
 
 ifstmt ::= matchedif
 	|  openif
 
-whilestmt ::= 🔄 condition '{' block '}'
-	   |  🔄 numberexpr '{' block '}'
+loopstmt ::= 🔄 '(' condition ')' '{' block '}'
+	  |  🔄 '(' tok_number ')' '{' block '}'
 
 program ::= block
