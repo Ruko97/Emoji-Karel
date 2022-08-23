@@ -1,5 +1,8 @@
 CC = g++
-CFLAGS = -g- w -Wall
+CFLAGS = -g -w -Wall
 
-lexer.o: lexer.h lexer.cpp
+lexer.o: lexer.hpp lexer.cpp
 	$(CC) $(CFLAGS) -c lexer.cpp
+
+ast.o: ast.hpp
+	$(CC) $(CFLAGS) -c ast.hpp
