@@ -7,3 +7,6 @@ lexer.o: lexer.hpp lexer.cpp
 parser.o: parser.hpp parser.cpp ast.hpp lexer.o
 	$(CC) $(CFLAGS) -c parser.cpp
 
+test_lexer: lexer.o test/lexer/getTokTest/test.cpp 
+	$(CC) $(CFLAGS) $^ -o test/lexer/getTokTest/test.out -I.
+
