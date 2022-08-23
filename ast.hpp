@@ -1,12 +1,28 @@
 #pragma once
 
-#include <algorithm>
+#include <memory>
+#include "lexer.hpp"
+
+enum Movement {
+	move = Token::tok_move, turn_left = Token::turn_left
+};
 
 /// ExprAST - Base class for all expression nodes
 class ExprAST {
 public:
 	virtual ~ExprAST() = default;
 };
+
+/// MovementAST - Represents an movement, either move or turn left
+class MovementAST : public ExprAST {
+	Movement action;
+	
+public:
+	ActionAST(Movement movement) : movement(movement) {}
+};
+
+/// FrontBlockedAST - Indicating front blocked
+class FrontBlockedAST : public ExprAST {};
 
 /// NumberAST - Expression class for numeric literals
 class NumberAST : public ExprAST {
@@ -17,19 +33,19 @@ public:
 };
 
 /// NotExprAST - Indicating a not on a condition
-class NotExpr : public ExprAST {
-	std::unique_ptr<ExprAST> condition;
+class NotExprAST : public ExprAST {
+	std::unique_ptr<ExprAST> Cond;
 	
 public:
-	CondAST(std::unique_ptr<ExprASTAST> condition) : condition(condition) {}
+	NotExprAST(std::unique_ptr<ExprAST> Cond) : Cond(std::move(Cond)) {}
 };
 
 /// CondAST - Expression for conditions
 class CondAST : public ExprAST {
-	std::unique_ptr<ExprAST> condition;
+	std::unique_ptr<ExprAST> Cond;
 	
 public:
-	CondAST(std::unique_ptr<ExprAST> condition) : condition(condition) {}
+	CondAST(std::unique_ptr<ExprAST> Cond) : Cond(std::move(Cond)) {}
 };
 
 /// BinaryCondAST - Expression class for binary relations aka '&' and '|'
