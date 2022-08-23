@@ -67,6 +67,9 @@ static std::unique_ptr<ExprAST> ParseNot() {
 }
 
 /// condexpr ::= frontblkexpr
+/// 		  |  notexpr
+///   		  |  '(' condexpr ')'
+/// 		  |  binarycond
 static std::unique_ptr<ExprAST> ParseCond() {
 	switch (CurTok) {
 		case Token::tok_front_blocked:
