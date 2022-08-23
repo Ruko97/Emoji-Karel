@@ -29,26 +29,6 @@ static std::unique_ptr<ExprAST> LogError(const char *Str) {
 	fprintf(stderr, "Error: %s\n", Str);
 }
 
-/// numberexpr ::= number
-static std::unique_ptr<ExprAST> ParseNumberExpr() {
-	if (CurTok == '(') {
-		getNextToken();	// consume '('
-		
-		auto result = ParseNumberExpr();
-		if (!result) return nullptr;
-		
-		if (CurTok != ')') return LogError("Expected ')'");
-		getNextToken();	// consume ')'
-		
-		return result;	// NOTE: consumes up the numberexpr instead
-						// TODO: may need to modify this
-	} else {
-		auto result = std::make_unique<NumberAST>(numVal);
-		getNextToken();	// consume the number
-		return std::move(result);
-	}
-}
-
 /// movementexpr ::= ➡ 
 ///               |  ↩
 static std::unique_ptr<ExprAST> ParseMovement() {
@@ -100,3 +80,117 @@ static std::unique_ptr<ExprAST> ParseCond() {
 			return ParseBinaryCond();
 	}
 }
+
+/// binarycond ::= cond binorphs
+static std::unique_ptr<ExprAST> ParseBinaryCond() {
+	auto LHS = ParseCond();
+	if (!LHS) return nullptr;
+	return ParseBinOpRHS(0, std::move(LHS));
+}
+
+/// binoprhs ::= ('&' cond)*
+static std::unique_ptr<ExprAST> 
+ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS) {
+	while (true) {
+		int TokPrec = GetTokPrecedence();
+		
+		if (TokPrec < ExprPrec) return LHS;
+		
+		int BinOp = CurTok;
+		getNextToken();	// consume binary operator
+		
+		auto RHS = ParseCond();
+		if (!RHS) return nullptr;
+		
+		int NextPrec = GetTokPrecedence();
+		if (TokPrec < NextPrec) {
+			RHS = ParseBinOpRHS(TokPrec + 1, std::move(RHS));
+			if (!RHS) return nullptr;
+		}
+		
+		LHS = std::make_unique<BinaryCondAST>(
+				BinOp, std::move(LHS), std::move(RHS));
+	}
+}
+
+/// ifstmt ::= 🤔 '(' conditional ')' '{' block '}'
+/// 		|  🤔 '(' conditional ')' '{' block '}' 🙁 '{' block '}' 
+static std::unique_ptr<ExprAST> ParseIfStmt() {
+	getNextToken(); // consume the 🤔
+
+	if (CurTok != '(') return LogError("Expected '('");
+	getNextToken();	// consume '('
+	
+	auto Cond = ParseCond();
+	if (!Cond) return nullptr;
+
+	if (CurTok != ')') return LogError("Expected ')'");
+	getNextToken(); // consume ')'
+	
+	if (CurTok != '{') return LogError("Expected '{'");
+	getNextToken(); // consume '{'
+	
+	auto Then = ParseBlock();
+	if (!Then) return nullptr;
+	
+	if (CurTok != '}') return LogError("Expected '}'");
+	getNextToken(); // consume '}'
+	
+	// Now we choose if there is an else or not
+	if (CurTok != tok_else) 
+		return std::make_unique<IfExprAST>(Cond, Then, nullptr);
+	
+	getNextToken(); // consume 🙁
+	
+	if (CurTok != '{') return LogError("Expected '{'");
+	getNextToken(); // consume '{'
+	
+	auto Else = ParseBlock();
+	if (!Else) return nullptr;
+
+	if (CurTok != '}') return LogError("Expected '}'");
+	getNextToken(); // consume '}'
+	
+	return std::make_unique<IfExprAST>(Cond, Then, Else);
+}
+
+/// loopstmt ::= 🔄 '(' condition ')' '{' block '}'
+///           |  🔄 '(' tok_number ')' '{' block '}'
+static std::unique_ptr<ExprAST> ParseLoop() {
+	getNextToken();	// consume 🔄
+	
+	if (CurTok != '(') return LogError("Expected '('");
+	getNextToken();	// consume '('
+	
+	union {
+		std::unique_ptr<ExprAST> Cond;
+		int count;
+	} loopCond;
+	
+	if (CurTok == tok_number) {
+		loopCond.count = numVal;
+		getNextToken();	// consume the number
+	}
+	else {
+		loopCond.Cond = ParseCond();
+		if (!loopCond.Cond) return nullptr;
+	}
+
+	if (CurTok != ')') return LogError("Expected ')'");
+	getNextToken(); // consume ')'
+	
+	if (CurTok != '{') return LogError("Expected '{'");
+	getNextToken(); // consume '{'
+	
+	auto Body = ParseBlock();
+	if (!Body) return nullptr;
+	
+	if (CurTok != '}') return LogError("Expected '}'");
+	getNextToken(); // consume '}'
+	
+	if (CurTok == tok_number)
+		return std::make_unique<ForLoopAST>(loopCond.count, Body); 
+	else
+		return std::make_unique<WhileLoopAST>(loopCond.Cond, Body);
+}
+
