@@ -50,11 +50,11 @@ public:
 
 /// BinaryCondAST - Expression class for binary relations aka '&' and '|'
 class BinaryCondAST : public ExprAST {
-	char Op;
+	int Op;
 	std::unique_ptr<ExprAST> LHS, RHS;
 	
 public:
-	BinaryCondAST(char Op, std::unique_ptr<ExprAST> LHS, 
+	BinaryCondAST(int Op, std::unique_ptr<ExprAST> LHS, 
 			std::unique_ptr<ExprAST> RHS)
 		: Op(Op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
 };
