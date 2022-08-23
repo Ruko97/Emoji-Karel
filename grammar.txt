@@ -6,7 +6,7 @@ action ::= ➡
 block ::= action+
 
 numberexpr ::= tok_number
-            | '(' number ')'
+            | '(' numberexpr ')'
 
 notexpr ::= 🚫 conditional
 frontblkexpr ::= 🧱
@@ -19,10 +19,12 @@ conditional ::= frontblkexpr
 binarycond ::= conditional '&' conditional
 	    |  conditional '|' conditional
 
+NOTE: THERE IS PROBABILITY THAT WE MIGHT NOT NEED MATCHEDIF & OPENIF
+
 matchedif ::= 🤔 conditional '{' matchedif '}' 🙁 '{' matchedif '}' 
 	   |  block
 openif    ::= 🤔 conditional'{' block '}'
-	   |  🤔 conditional '{' matchedif '} 🙁 '{' openif '}'
+	   |  🤔 conditional '{' matchedif '}' 🙁 '{' openif '}'
 
 ifstmt ::= matchedif
 	|  openif
