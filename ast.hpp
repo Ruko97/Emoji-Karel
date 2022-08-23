@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include "lexer.hpp"
 
 enum Movement {
@@ -90,3 +91,20 @@ public:
 		: count(count), Body(std::move(Body)) {}
 };
 
+/// BlockAST - AST representing an entire block of elements
+class BlockAST : public ExprAST {
+	std::vector<std::unique_ptr<ExprAST>> actions;
+	
+public:
+	BlockAST(std::vector<std::unique_ptr<ExprAST>> actions) 
+		: expressions(std::move(actions)) {}
+};
+
+/// ProgramAST - AST representing a program
+class ProgramAST : public ExprAST {
+	std::unique_ptr<ExprAST> StartBlock;
+	
+public:
+	ProgramAST(std::unique_ptr<ExprAST> StartBlock) 
+		: StartBlock(std::move(StartBlock)) {}
+};
