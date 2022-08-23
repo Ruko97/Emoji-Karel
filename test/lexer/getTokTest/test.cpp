@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "../../../lexer.h"
+#include "lexer.hpp"
 
 int main(int argc, char **argv) {
 	int expectedOutput[] = { Token::tok_while, '(', Token::tok_number, ')', 
