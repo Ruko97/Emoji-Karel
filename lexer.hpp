@@ -21,5 +21,5 @@ enum Token {
 // This contains the numeric value of a integer if getTok == tok_number
 extern int numVal;
 
-static int getNextUnicode();
+int getNextUnicode();
 int getTok();

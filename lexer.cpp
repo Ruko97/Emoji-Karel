@@ -4,7 +4,7 @@
 #include "lexer.hpp"
 
 // Returns a 4-byte integer representing the unicode value of the next character
-static int getNextUnicode() {
+int getNextUnicode() {
 	int output = 0;
 	int thisChar = getchar();
 	
@@ -59,7 +59,7 @@ int getTok() {
 	
 	if (thisChar == '#') {
 		// Comment until end of line.
-		do thisChar = getchar();
+		do thisChar = getNextUnicode();
 		while (thisChar != EOF && thisChar != '\n' && thisChar != '\r');
 		
 		if (thisChar != EOF) return getTok();
