@@ -5,6 +5,8 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 
+int CurTok;
+int getNextToken() { return CurTok = getTok(); }
 std::map<char, int> BinopPrecedence;
 
 /// movementstmt ::= ➡ 
@@ -216,8 +218,11 @@ static std::unique_ptr<ExprAST> ParseBlock() {
 
 /// program ::= block
 std::unique_ptr<ExprAST> ParseProgram() {
-	if (auto B = ParseBlock()) 
-		return std::make_unique<ProgramAST>(std::move(B));
+	if (auto B = ParseBlock()) {
+		auto output = std::make_unique<ProgramAST>(std::move(B));
+		if (getNextToken() == tok_eof) return output;
+		else return LogError("Expected EOF");
+	}
 	else 
 		return nullptr;
 }
