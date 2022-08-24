@@ -36,7 +36,6 @@ static int getNextUnicode() {
 	return output;
 }
 
-// This contains the numeric value of a integer if getTok == tok_number
 int numVal;
 
 int getTok() {

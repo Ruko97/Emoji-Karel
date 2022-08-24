@@ -5,6 +5,8 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 
+std::map<char, int> BinopPrecedence;
+
 /// movementstmt ::= ➡ 
 ///               |  ↩
 static std::unique_ptr<ExprAST> ParseMovement() {

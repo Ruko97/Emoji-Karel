@@ -1,5 +1,10 @@
+#pragma once
+
 #include <cstdio>
 #include <memory>
+#include <map>
+#include "lexer.hpp"
+#include "ast.hpp"
 
 /// CurTok/getNextToken - Provides a simple token buffer. CurTok is the current
 /// token the parser is looking at.  getNextToken reads another token from the
@@ -8,7 +13,7 @@ static int CurTok;
 static int getNextToken() { return CurTok = getTok(); }
 
 /// BinopPrecedence - holds the precendence for each binary operation that is defined
-static std::map<char, int> BinopPrecedence;
+extern std::map<char, int> BinopPrecedence;
 
 /// GetTokPrecedence - Get the precedence of the pending binary operator token
 static int GetTokPrecedence() {
