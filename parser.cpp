@@ -150,15 +150,18 @@ static std::unique_ptr<ExprAST> ParseLoop() {
 	if (CurTok != '(') return LogError("Expected '('");
 	getNextToken();	// consume '('
 	
+	LoopType loopType;
 	// TODO: need to put these two variables in a union instead to save memory
 	std::unique_ptr<ExprAST> Cond;	// used only in while loops
 	int count;						// used only in for loops
 	
 	if (CurTok == tok_number) {
+		loopType = for_loop;
 		count = numVal;
 		getNextToken();	// consume the number
 	}
 	else {
+		loopType = while_loop;
 		Cond = ParseCond();
 		if (!Cond) return nullptr;
 	}
@@ -175,7 +178,7 @@ static std::unique_ptr<ExprAST> ParseLoop() {
 	if (CurTok != '}') return LogError("Expected '}'");
 	getNextToken(); // consume '}'
 	
-	if (CurTok == tok_number)
+	if (loopType == for_loop)
 		return std::make_unique<ForLoopAST>(count, std::move(Body)); 
 	else
 		return std::make_unique<WhileLoopAST>(std::move(Cond), std::move(Body));

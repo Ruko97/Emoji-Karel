@@ -31,6 +31,9 @@ static std::unique_ptr<ExprAST> LogError(const char *Str) {
 	fprintf(stderr, "Error: %s\n", Str);
 }
 
+/// Representing the type of loop in parseLoop
+enum LoopType { for_loop, while_loop };
+
 /// struct with a union that stores either count (in for-loop) or 
 /// boolean condition (in while-loop)
 struct LoopCond {
