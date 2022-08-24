@@ -40,42 +40,47 @@ int getNextUnicode() {
 int numVal;
 
 int getTok() {
-	int thisChar = getNextUnicode();
+	static int LastChar = ' ';
 	
 	// TODO: may add more whitespace characters in this condition in the future
 	// We aren't using isspace function here because isspace doesn't support 
 	// unicode
-	while(thisChar == ' ' || thisChar == '\n' || thisChar == '\t' 
-			|| thisChar == '\r' || thisChar == '\v' || thisChar == '\f') {
-		thisChar = getNextUnicode();
-	}
+	do
+		LastChar = getNextUnicode();
+	while(LastChar == ' ' || LastChar == '\n' || LastChar == '\t' 
+			|| LastChar == '\r' || LastChar == '\v' || LastChar == '\f');
 	
-	if (thisChar == EOF)
-		return Token::tok_eof;
+	if (LastChar == 0x27A1) return Token::tok_move;
+	if (LastChar == 0x21A9) return Token::tok_turn_left;
+	if (LastChar == 0x1F914) return Token::tok_if;
+	if (LastChar == 0x1F641) return Token::tok_else;
+	if (LastChar == 0x1F504) return Token::tok_while;
+	if (LastChar == 0x1F6AB) return Token::tok_not;
+	if (LastChar == 0x1F9F1) return Token::tok_front_blocked;
 		
-	if (thisChar >= '0' && thisChar <= '9') {
+	if (LastChar >= '0' && LastChar <= '9') {
 		numVal = 0;
 		do {
-			numVal = numVal * 10 + (thisChar - '0');
-			thisChar = getNextUnicode();
-		} while (thisChar >= '0' && thisChar <= '9');
+			numVal = numVal * 10 + (LastChar - '0');
+			LastChar = getNextUnicode();
+		} while (LastChar >= '0' && LastChar <= '9');
 		
 		return Token::tok_number;
 	}
 	
-	if (thisChar == '#') {
+	if (LastChar == '#') {
 		// Comment until end of line.
-		do thisChar = getNextUnicode();
-		while (thisChar != EOF && thisChar != '\n' && thisChar != '\r');
+		do 
+			LastChar = getNextUnicode();
+		while (LastChar != EOF && LastChar != '\n' && LastChar != '\r');
 		
-		if (thisChar != EOF) return getTok();
+		if (LastChar != EOF) return getTok();
 	}
 	
-	if (thisChar == 0x27A1) return Token::tok_move;
-	if (thisChar == 0x21A9) return Token::tok_turn_left;
-	if (thisChar == 0x1F914) return Token::tok_if;
-	if (thisChar == 0x1F641) return Token::tok_else;
-	if (thisChar == 0x1F504) return Token::tok_while;
-	if (thisChar == 0x1F6AB) return Token::tok_not;
-	if (thisChar == 0x1F9F1) return Token::tok_front_blocked;
+	if (LastChar == EOF)
+	return Token::tok_eof;
+	
+	int ThisChar = LastChar;
+	LastChar = getNextUnicode();
+	return ThisChar;
 }
