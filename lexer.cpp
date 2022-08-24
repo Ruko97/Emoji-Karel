@@ -30,6 +30,7 @@ int getNextUnicode() {
 		output <<= 6;
 		thisChar = getchar();
 		assert(thisChar != EOF);
+		assert(thisChar >> 6 == 0x2);
 		output += thisChar & 0x3F;
 	}
 
@@ -41,18 +42,23 @@ int numVal;
 int getTok() {
 	int thisChar = getNextUnicode();
 	
-	while(isspace(thisChar))
+	// TODO: may add more whitespace characters in this condition in the future
+	// We aren't using isspace function here because isspace doesn't support 
+	// unicode
+	while(thisChar == ' ' || thisChar == '\n' || thisChar == '\t' 
+			|| thisChar == '\r' || thisChar == '\v' || thisChar == '\f') {
 		thisChar = getNextUnicode();
+	}
 	
 	if (thisChar == EOF)
 		return Token::tok_eof;
 		
-	if (isdigit(thisChar)) {
+	if (thisChar >= '0' && thisChar <= '9') {
 		numVal = 0;
 		do {
 			numVal = numVal * 10 + (thisChar - '0');
 			thisChar = getNextUnicode();
-		} while (isdigit(thisChar));
+		} while (thisChar >= '0' && thisChar <= '9');
 		
 		return Token::tok_number;
 	}
