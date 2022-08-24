@@ -63,34 +63,22 @@ int getTok() {
 		return Token::tok_number;
 	}
 	
-
-	if (LastChar == 0x27A1) {
+	if (LastChar >= 128) {	// AKA a non-ascii unicode chaacter
+		int output = 0;
+		
+		if (LastChar == 0x27A1) output = Token::tok_move;
+		if (LastChar == 0x21A9) output = Token::tok_turn_left;
+		if (LastChar == 0x1F914) output = Token::tok_if;
+		if (LastChar == 0x1F641) output = Token::tok_else;
+		if (LastChar == 0x1F504) output = Token::tok_while;
+		if (LastChar == 0x1F6AB) output = Token::tok_not;
+		if (LastChar == 0x1F9F1) output = Token::tok_front_blocked;
+		
+		if (output == 0) fprintf(stderr, "Error: Expected a valid emoji\n");
+		
 		LastChar = getNextUnicode();
-		return Token::tok_move;
-	}
-	if (LastChar == 0x21A9) {
-		LastChar = getNextUnicode();
-		return Token::tok_turn_left;
-	}
-	if (LastChar == 0x1F914) {
-		LastChar = getNextUnicode();
-		return Token::tok_if;
-	}
-	if (LastChar == 0x1F641) {
-		LastChar = getNextUnicode();
-		return Token::tok_else;
-	}
-	if (LastChar == 0x1F504) {
-		LastChar = getNextUnicode();
-		return Token::tok_while;
-	}
-	if (LastChar == 0x1F6AB) {
-		LastChar = getNextUnicode();
-		return Token::tok_not;
-	}
-	if (LastChar == 0x1F9F1) {
-		LastChar = getNextUnicode();
-		return Token::tok_front_blocked;
+		
+		return output;
 	}
 	
 	if (LastChar == '#') {
