@@ -9,4 +9,6 @@ int main(int argc, char **argv) {
 	auto program = ParseProgram();
 	
 	std::cout << "ALL OK" << std::endl;
+	
+	program->dump(0);
 }

@@ -12,6 +12,7 @@ enum Movement {
 class ExprAST {
 public:
 	virtual ~ExprAST() = default;
+	virtual void dump(int indent) = 0;
 };
 
 /// MovementAST - Represents an movement, either move or turn left
@@ -20,17 +21,13 @@ class MovementAST : public ExprAST {
 	
 public:
 	MovementAST(Movement movement) : movement(movement) {}
+	void dump(int indent) override;
 };
 
 /// FrontBlockedAST - Indicating front blocked
-class FrontBlockedAST : public ExprAST {};
-
-/// NumberAST - Expression class for numeric literals
-class NumberAST : public ExprAST {
-	int val;
-	
+class FrontBlockedAST : public ExprAST {
 public:
-	NumberAST(int val) : val(val) {}
+	void dump(int indent) override;
 };
 
 /// NotExprAST - Indicating a not on a condition
@@ -39,6 +36,7 @@ class NotExprAST : public ExprAST {
 	
 public:
 	NotExprAST(std::unique_ptr<ExprAST> Cond) : Cond(std::move(Cond)) {}
+	void dump(int indent) override;
 };
 
 /// CondAST - Expression for conditions
@@ -47,6 +45,7 @@ class CondAST : public ExprAST {
 	
 public:
 	CondAST(std::unique_ptr<ExprAST> Cond) : Cond(std::move(Cond)) {}
+	void dump(int indent) override;
 };
 
 /// BinaryCondAST - Expression class for binary relations aka '&' and '|'
@@ -58,6 +57,7 @@ public:
 	BinaryCondAST(int Op, std::unique_ptr<ExprAST> LHS, 
 			std::unique_ptr<ExprAST> RHS)
 		: Op(Op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
+	void dump(int indent) override;
 };
 
 /// IfExprAST - Expression class for if/then/else
@@ -69,6 +69,7 @@ public:
 	IfExprAST(std::unique_ptr<ExprAST> Cond, std::unique_ptr<ExprAST> Then, 
 			std::unique_ptr<ExprAST> Else)
 		: Cond(std::move(Cond)), Then(std::move(Then)), Else(std::move(Else)) {}
+	void dump(int indent) override;
 };
 
 /// WhileLoopAST - Expression class for while loops - aka loops with a condition
@@ -79,6 +80,7 @@ class WhileLoopAST : public ExprAST {
 public:
 	WhileLoopAST(std::unique_ptr<ExprAST> Cond, std::unique_ptr<ExprAST> Body)
 		: Cond(std::move(Cond)), Body(std::move(Body)) {}
+	void dump(int indent) override;
 };
 
 /// ForLoopAST - Expression class indicating for loops loop over 'count' times
@@ -89,6 +91,7 @@ class ForLoopAST : public ExprAST {
 public:
 	ForLoopAST(int count, std::unique_ptr<ExprAST> Body) 
 		: count(count), Body(std::move(Body)) {}
+	void dump(int indent) override;
 };
 
 /// BlockAST - AST representing an entire block of elements
@@ -98,6 +101,7 @@ class BlockAST : public ExprAST {
 public:
 	BlockAST(std::vector<std::unique_ptr<ExprAST>> actions) 
 		: actions(std::move(actions)) {}
+	void dump(int indent) override;
 };
 
 /// ProgramAST - AST representing a program
@@ -107,4 +111,6 @@ class ProgramAST : public ExprAST {
 public:
 	ProgramAST(std::unique_ptr<ExprAST> StartBlock) 
 		: StartBlock(std::move(StartBlock)) {}
+	void dump() { dump(0); }
+	void dump(int indent) override;
 };
