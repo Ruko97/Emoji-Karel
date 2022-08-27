@@ -12,6 +12,14 @@ enum Movement {
 class ExprAST {
 public:
 	virtual ~ExprAST() = default;
+
+	// Generates the actual assembly code
+	virtual void codegen(ostream &out) = 0;
+
+	// Helper function: counts the number of instructions in codegen
+	virtual int instructionCount() = 0;
+	
+	// Debugging function: dumps the contents of the AST in readable format
 	virtual void dump(int indent) = 0;
 };
 
@@ -21,13 +29,17 @@ class MovementAST : public ExprAST {
 	
 public:
 	MovementAST(Movement movement) : movement(movement) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump(int indent) override;
 };
 
 /// FrontBlockedAST - Indicating front blocked
 class FrontBlockedAST : public ExprAST {
 public:
-	void dump(int indent) override;
+	void codegen(ostream &out) override;
+	int instructionCount() override;
+	void dump(int indent) override;	
 };
 
 /// NotExprAST - Indicating a not on a condition
@@ -36,6 +48,8 @@ class NotExprAST : public ExprAST {
 	
 public:
 	NotExprAST(std::unique_ptr<ExprAST> Cond) : Cond(std::move(Cond)) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump(int indent) override;
 };
 
@@ -45,6 +59,8 @@ class CondAST : public ExprAST {
 	
 public:
 	CondAST(std::unique_ptr<ExprAST> Cond) : Cond(std::move(Cond)) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump(int indent) override;
 };
 
@@ -57,6 +73,8 @@ public:
 	BinaryCondAST(int Op, std::unique_ptr<ExprAST> LHS, 
 			std::unique_ptr<ExprAST> RHS)
 		: Op(Op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump(int indent) override;
 };
 
@@ -69,6 +87,8 @@ public:
 	IfExprAST(std::unique_ptr<ExprAST> Cond, std::unique_ptr<ExprAST> Then, 
 			std::unique_ptr<ExprAST> Else)
 		: Cond(std::move(Cond)), Then(std::move(Then)), Else(std::move(Else)) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump(int indent) override;
 };
 
@@ -80,6 +100,8 @@ class WhileLoopAST : public ExprAST {
 public:
 	WhileLoopAST(std::unique_ptr<ExprAST> Cond, std::unique_ptr<ExprAST> Body)
 		: Cond(std::move(Cond)), Body(std::move(Body)) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump(int indent) override;
 };
 
@@ -91,6 +113,8 @@ class ForLoopAST : public ExprAST {
 public:
 	ForLoopAST(int count, std::unique_ptr<ExprAST> Body) 
 		: count(count), Body(std::move(Body)) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump(int indent) override;
 };
 
@@ -101,6 +125,8 @@ class BlockAST : public ExprAST {
 public:
 	BlockAST(std::vector<std::unique_ptr<ExprAST>> actions) 
 		: actions(std::move(actions)) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump(int indent) override;
 };
 
@@ -111,6 +137,9 @@ class ProgramAST : public ExprAST {
 public:
 	ProgramAST(std::unique_ptr<ExprAST> StartBlock) 
 		: StartBlock(std::move(StartBlock)) {}
+	void codegen(ostream &out) override;
+	int instructionCount() override;
 	void dump() { dump(0); }
 	void dump(int indent) override;
 };
+
