@@ -86,7 +86,7 @@ void BinaryCondAST::codegen(std::ostream &out) {
 void IfExprAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
 	// If Cond == 0, skips instructions of 'Then'
-	out << "JZ " << Then->instructionCount() << std::endl;
+	out << "JZ " << Then->instructionCount() + 2 << std::endl;
 	Then->codegen(out);
 	// Jumps over 'Else's instructions
 	out << "JMP " << Else->instructionCount() << std::endl;
