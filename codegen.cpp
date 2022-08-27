@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include "ast.hpp"
 
 /************************************************************/
@@ -22,9 +23,9 @@ int WhileLoopAST::instructionCount() {
 	return Cond->instructionCount() + Body->instructionCount() + 2;
 }
 
-int ForLoopAST::instructionCount() { return Body->instructionCount() + 8; }d
+int ForLoopAST::instructionCount() { return Body->instructionCount() + 8; }
 
-int BlockLoopAST::instructionCount() {
+int BlockAST::instructionCount() {
 	int result = 0;
 	for (auto &action : actions) {
 		result += action->instructionCount();
@@ -42,30 +43,30 @@ int ProgramAST::instructionCount() {
 
 // TODO: add enums in codegen instead of using strings
 
-void MovementAST::codegen(ostream &out) {
+void MovementAST::codegen(std::ostream &out) {
 	if (movement == move) 
 		out << "MOVE" << std::endl;
-	else if (movment == turn_left) 
+	else if (movement == turn_left) 
 		out << "TURNLEFT" << std::endl;
 	else assert(movement == move || movement == turn_left);	// should show error
 }
 
-void FrontBlockedAST::codegen(ostream &out) {
+void FrontBlockedAST::codegen(std::ostream &out) {
 	out << "FRONTBLOCKED" << std::endl;	// After running FRONTBLOCKED instruction,
 										// the accumulator should contain 1 if
 										// front is really blocked, and 0 otherwise
 }
 
-void NotExprAST::codegen(ostream &out) {
+void NotExprAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
 	out << "NOT" << std::endl;	// NOT instruction inverts value in accumulator
 }
 
-void CondAST::codegen(ostream &out) {
+void CondAST::codegen(std::ostream &out) {
 	Cond->codegen(out);	
 }
 
-void BinaryCondAST::codegen(ostream &out) {
+void BinaryCondAST::codegen(std::ostream &out) {
 	LHS->codegen(out);
 	out << "PUSH" << std::endl;	// PUSH instruction pushes accumulator in stack
 	RHS->codegen(out);
@@ -79,7 +80,7 @@ void BinaryCondAST::codegen(ostream &out) {
 	out << "POP" << std::endl;	// POP instruction pops value from top of stack
 }
 
-void IfExprAST::codegen(ostream &out) {
+void IfExprAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
 	// If Cond == 0, skips instructions of 'Then'
 	out << "JZ " << Then->instructionCount() << std::endl;	
@@ -89,7 +90,7 @@ void IfExprAST::codegen(ostream &out) {
 	Else->codegen(out);
 }
 
-void WhileLoopAST::codegen(ostream &out) {
+void WhileLoopAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
 	out << "JZ " << Body->instructionCount() + 1 << std::endl;
 	Body->codegen(out);
@@ -98,7 +99,7 @@ void WhileLoopAST::codegen(ostream &out) {
 		<< std::endl;
 }
 
-void ForLoopAST::codegen(ostream &out) {
+void ForLoopAST::codegen(std::ostream &out) {
 	out << "PUSH" << std::endl;			// Push current value of acc into stack
 	out << "SET 0" << std::endl;		// Set acc = 0
 	
@@ -117,13 +118,13 @@ void ForLoopAST::codegen(ostream &out) {
 	out << "POP" << std::endl;			// pops top of stack
 }
 
-void BlockLoopAST::codegen(ostream &out) {
+void BlockAST::codegen(std::ostream &out) {
 	for (auto &action : actions) {
 		action->codegen(out);
 	}	
 }
 
-void ProgramAST::codegen(ostream &out) {
+void ProgramAST::codegen(std::ostream &out) {
 	out << "START" << std::endl;	// Indicating start of program
 	StartBlock->codegen(out);
 	out << "END" << std::endl;		// Indicating end of program
