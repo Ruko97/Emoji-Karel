@@ -24,8 +24,8 @@ int WhileLoopAST::instructionCount() {
 }
 
 int ForLoopAST::instructionCount() {
-  // +1 for PUSHCOUNT, +1 for JCE, +1 for INC and +1 for POPCOUNT
-  return Body->instructionCount() + 8;
+  // +1 for PUSHCOUNT, +1 for JCE, +1 for INC, +1 for JMP and +1 for POPCOUNT
+  return Body->instructionCount() + 5;
 }
 
 int BlockAST::instructionCount() {
@@ -95,7 +95,7 @@ void IfExprAST::codegen(std::ostream &out) {
 
 void WhileLoopAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
-	out << "JZ " << Body->instructionCount() + 1 << std::endl;
+	out << "JZ " << Body->instructionCount() + 2 << std::endl;
 	Body->codegen(out);
 	out << "JMP "
 		<< -(Body->instructionCount() + 1 + Cond->instructionCount())
@@ -111,7 +111,7 @@ void ForLoopAST::codegen(std::ostream &out) {
 	// JCE (jump counter equal): JCE count offset
 	// Checks if the value in the current counter register == count and jumps
 	// 'jumpoffset' instructions if they are equal
-	out << "JCE " << count << " " << Body->instructionCount() + 1 << std::endl;
+	out << "JCE " << count << " " << Body->instructionCount() + 3 << std::endl;
 
 	Body->codegen(out);
 	out << "INC" << std::endl;			// increments value of counter register
