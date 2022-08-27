@@ -86,18 +86,22 @@ void BinaryCondAST::codegen(std::ostream &out) {
 void IfExprAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
 	// If Cond == 0, skips instructions of 'Then'
-	out << "JZ " << Then->instructionCount() + 2 << std::endl;
+	out << "JZ " << Then->instructionCount() + 2
+	  << std::endl;  // +1 to jump to JMP, +1 to overcome it
 	Then->codegen(out);
 	// Jumps over 'Else's instructions
-	out << "JMP " << Else->instructionCount() << std::endl;
+	out << "JMP " << Else->instructionCount() + 1
+	  << std::endl;  // + 1 to overcome Else's generated code
 	Else->codegen(out);
 }
 
 void WhileLoopAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
-	out << "JZ " << Body->instructionCount() + 2 << std::endl;
+	out << "JZ " << Body->instructionCount() + 2
+	  << std::endl;  // +1 to jump to JMP, +1 to overcome it
 	Body->codegen(out);
 	out << "JMP "
+	  // Backward jumps don't require the additional +1 to overcome them
 		<< -(Body->instructionCount() + 1 + Cond->instructionCount())
 		<< std::endl;
 }
@@ -111,13 +115,14 @@ void ForLoopAST::codegen(std::ostream &out) {
 	// JCE (jump counter equal): JCE count offset
 	// Checks if the value in the current counter register == count and jumps
 	// 'jumpoffset' instructions if they are equal
-	out << "JCE " << count << " " << Body->instructionCount() + 3 << std::endl;
+	out << "JCE " << count << " " << Body->instructionCount() + 3
+	  << std::endl;  // +1 to jump to INC, +1 to jump to JMP, +1 to overcome JMP
 
 	Body->codegen(out);
 	out << "INC" << std::endl;			// increments value of counter register
 	out << "JMP "
 		<< -(Body->instructionCount() + 2)
-		<< std::endl;					// +1 for INC, +1 for JCE
+		<< std::endl;  // +1 for INC, +1 for JCE. Backward jumps dont need extra +1
 
   // sets counter register's value to the value on top of stack and pops
   // one value from stack
