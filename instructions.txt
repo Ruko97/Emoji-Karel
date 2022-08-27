@@ -1,0 +1,24 @@
+Karel has two registers: an accumulator and a counter register.
+It also has two stacks to store intermediate values, one for accumulator values
+and one for counter registers.
+Counter registers are only used for storing counters of for-loops.
+While accumulators are used for storing boolean outputs.
+Note: $offset can be both positive and negative
+
+MOVE                Moves karel once step forward
+TURNLEFT            Turns karel left
+FRONTBLOCKED        Sets accumulator to 1 if front blocked, 0 otherwise
+NOT                 Negates the value in the accumulator
+PUSH                Pushes current value in accumulator to accumulator's stack
+POP                 Pops the top value from the stack
+AND                 Runs logical-and operator on accumulator and top of stack
+OR                  Runs logical-or operator on accumulator and top of stack
+JZ $offset          Jumps $offset instructions if value in accumulator is 0
+JMP $offset         Jumps $offset instructions unconditionally
+PUSHCOUNT           Pushes the current value in the counter register to its
+                    stack, and sets counter register to 0
+POPCOUNT            Pops the top value from the counter register stack and
+                    sets the value of the counter register to it
+JCE $count $offset  Checks if the value in the current counter register equals
+                    $count and jumps $offset instructions if they are equal
+INC                 Incrments the value in the counter register by 1
