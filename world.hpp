@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <stack>
 
 #define WORLDSIZE 8
 
@@ -41,9 +42,19 @@ Box[WORLDSIZE][WORLDSIZE] World;
 
 enum Direction { top, bottom, left, right };
 
-struct Karel {
+class Karel {
     int i, j;
     Direction direction;
+
+    int pc;    // program counter
+    unsigned int accumulator, counter;    // counter is the counter register
+    std::stack<unsigned int> accumulator_stack,
+        counter_stack;
+public:
+    Karel() { reset(); }
+    void reset();
 };
+
+Karel karel;
 
 void createDefaultWorld();

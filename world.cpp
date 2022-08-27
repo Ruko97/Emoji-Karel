@@ -1,5 +1,16 @@
 #include "world.hpp"
 
+void Karel::reset() {
+    i = WORLDSIZE-1;
+    j = 0;
+    orientation = right;
+
+    pc = 0;    // or maybe 1, not sure
+    accumulator = 0, counter = 0;
+    while (!accumulator_stack.empty()) accumulator_stack.pop();
+    while (!counter_stack.empty()) counter_stack.pop();
+}
+
 void createDefaultWorld() {
     // TODO: add memset here
 
@@ -12,7 +23,5 @@ void createDefaultWorld() {
         World[0][WORLDSIZE-1].bottom = 1;
     }
 
-    Karel.i = WORLDSIZE-1;
-    Karel.j = 0;
-    Karel.orientation = right;
+    karel.reset();
 }
