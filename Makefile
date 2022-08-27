@@ -20,6 +20,9 @@ test_lexer: lexer.o test/lexer/getTokTest/test.cpp
 test_parser: lexer.o dump.o codegen.o parser.o ast.hpp util.hpp test/parser/test.cpp
 	${CC} $(CFLAGS) $^ -o test/parser/test.out $(INCLUDE)
 
+test_codegen: lexer.o dump.o codegen.o parser.o ast.hpp util.hpp test/codegen/test.cpp
+	$(CC) $(CFLAGS) $^ -o test/codegen/test.out $(INCLUDE)
+
 showTokens.out: lexer.o dump.o codegen.o parser.o ast.hpp test/lexer/showTokens.cpp
 	$(CC) $(CFLAGS) $^ -o test/lexer/showTokens.out $(INCLUDE)
 
