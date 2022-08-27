@@ -23,7 +23,10 @@ int WhileLoopAST::instructionCount() {
 	return Cond->instructionCount() + Body->instructionCount() + 2;
 }
 
-int ForLoopAST::instructionCount() { return Body->instructionCount() + 8; }
+int ForLoopAST::instructionCount() {
+  // +1 for PUSHCOUNT, +1 for JCE, +1 for INC and +1 for POPCOUNT
+  return Body->instructionCount() + 8;
+}
 
 int BlockAST::instructionCount() {
 	int result = 0;
@@ -33,8 +36,8 @@ int BlockAST::instructionCount() {
 	return result;
 }
 
-int ProgramAST::instructionCount() { 
-	return StartBlock->instructionCount() + 2; 
+int ProgramAST::instructionCount() {
+	return StartBlock->instructionCount() + 2;
 }
 
 /************************************************************/
@@ -44,9 +47,9 @@ int ProgramAST::instructionCount() {
 // TODO: add enums in codegen instead of using strings
 
 void MovementAST::codegen(std::ostream &out) {
-	if (movement == move) 
+	if (movement == move)
 		out << "MOVE" << std::endl;
-	else if (movement == turn_left) 
+	else if (movement == turn_left)
 		out << "TURNLEFT" << std::endl;
 	else assert(movement == move || movement == turn_left);	// should show error
 }
@@ -63,14 +66,14 @@ void NotExprAST::codegen(std::ostream &out) {
 }
 
 void CondAST::codegen(std::ostream &out) {
-	Cond->codegen(out);	
+	Cond->codegen(out);
 }
 
 void BinaryCondAST::codegen(std::ostream &out) {
 	LHS->codegen(out);
 	out << "PUSH" << std::endl;	// PUSH instruction pushes accumulator in stack
 	RHS->codegen(out);
-	if (Op == '&') 
+	if (Op == '&')
 		out << "AND" << std::endl;	// AND instruction runs logical-and operator
 									// on accumulator and top of stack
 	else if (Op == '|')
@@ -83,10 +86,10 @@ void BinaryCondAST::codegen(std::ostream &out) {
 void IfExprAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
 	// If Cond == 0, skips instructions of 'Then'
-	out << "JZ " << Then->instructionCount() << std::endl;	
+	out << "JZ " << Then->instructionCount() << std::endl;
 	Then->codegen(out);
 	// Jumps over 'Else's instructions
-	out << "JMP " << Else->instructionCount() << std::endl;	
+	out << "JMP " << Else->instructionCount() << std::endl;
 	Else->codegen(out);
 }
 
@@ -94,34 +97,37 @@ void WhileLoopAST::codegen(std::ostream &out) {
 	Cond->codegen(out);
 	out << "JZ " << Body->instructionCount() + 1 << std::endl;
 	Body->codegen(out);
-	out << "JMP " 
+	out << "JMP "
 		<< -(Body->instructionCount() + 1 + Cond->instructionCount())
 		<< std::endl;
 }
 
 void ForLoopAST::codegen(std::ostream &out) {
-	out << "PUSH" << std::endl;			// Push current value of acc into stack
-	out << "SET 0" << std::endl;		// Set acc = 0
-	
-	// CE (check equal) instruction checks if acc's value is equal to count's
-	// and sets acc=1 if they are equal (and 0 otherwise)
-	out << "CE " << count << std::endl;	 
-	out << "JNE " << Body->instructionCount() + 1 << std::endl;	
+  // We use a separate stack of counter registers to store count of each
+  // for loop. PUSHCOUNT instruction pushes the current counter register on
+  // its own stack and sets counter register = 0
+	out << "PUSHCOUNT" << std::endl;
+
+	// JCE (jump counter equal): JCE count offset
+	// Checks if the value in the current counter register == count and jumps
+	// 'jumpoffset' instructions if they are equal
+	out << "JCE " << count << " " << Body->instructionCount() + 1 << std::endl;
 
 	Body->codegen(out);
-	out << "INC" << std::endl;			// increments value on top of stack by 1	
-	out << "JMP " 
-		<< -(Body->instructionCount() + 3) 
-		<< std::endl;					// +1 for INC, +1 for JNE and +1 for CE
+	out << "INC" << std::endl;			// increments value of counter register
+	out << "JMP "
+		<< -(Body->instructionCount() + 2)
+		<< std::endl;					// +1 for INC, +1 for JCE
 
-	out << "LTS" << std::endl;			// loads top of stack to accumulator
-	out << "POP" << std::endl;			// pops top of stack
+  // sets counter register's value to the value on top of stack and pops
+  // one value from stack
+	out << "POPCOUNT" << std::endl;
 }
 
 void BlockAST::codegen(std::ostream &out) {
 	for (auto &action : actions) {
 		action->codegen(out);
-	}	
+	}
 }
 
 void ProgramAST::codegen(std::ostream &out) {
