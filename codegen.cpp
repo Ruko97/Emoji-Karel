@@ -4,6 +4,37 @@
 /************************************************************/
 /* Instruction Count										*/
 /************************************************************/
+int MovementAST::instructionCount() { return 1; }
+int FrontBlockedAST::instructionCount() { return 1; }
+int NotExprAST::instructionCount() { return Cond->instructionCount() + 1; }
+int CondAST::instructionCount() { return Cond->instructionCount(); }
+
+int BinaryCondAST::instructionCount() {
+	return LHS->instructionCount() + RHS->instructionCount() + 3;
+}
+
+int IfExprAST::instructionCount() {
+	return Cond->instructionCount() + 2 + Then->instructionCount()
+			+ Else->instructionCount();
+}
+
+int WhileLoopAST::instructionCount() {
+	return Cond->instructionCount() + Body->instructionCount() + 2;
+}
+
+int ForLoopAST::instructionCount() { return Body->instructionCount() + 8; }d
+
+int BlockLoopAST::instructionCount() {
+	int result = 0;
+	for (auto &action : actions) {
+		result += action->instructionCount();
+	}
+	return result;
+}
+
+int ProgramAST::instructionCount() { 
+	return StartBlock->instructionCount() + 2; 
+}
 
 /************************************************************/
 /* Codegen				 								  	*/
