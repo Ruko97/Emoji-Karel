@@ -7,7 +7,7 @@
 int getNextUnicode() {
 	int output = 0;
 	int thisChar = getchar();
-	
+
 	if (thisChar == EOF) return thisChar;
 
 	if (thisChar >> 7 == 0) return thisChar;
@@ -43,32 +43,32 @@ int getTok() {
 	static int LastChar = ' ';
 
 	// TODO: may add more whitespace characters in this condition in the future
-	// We aren't using isspace function here because isspace doesn't support 
+	// We aren't using isspace function here because isspace doesn't support
 	// unicode
-	while(LastChar == ' ' || LastChar == '\n' || LastChar == '\t' 
+	while(LastChar == ' ' || LastChar == '\n' || LastChar == '\t'
 			|| LastChar == '\r' || LastChar == '\v' || LastChar == '\f') {
 		LastChar = getNextUnicode();
 	}
-	
+
 	if (LastChar == EOF)
 		return Token::tok_eof;
-		
+
 	if (LastChar >= '0' && LastChar <= '9') {
 		numVal = 0;
 		do {
 			numVal = numVal * 10 + (LastChar - '0');
 			LastChar = getNextUnicode();
 		} while (LastChar >= '0' && LastChar <= '9');
-		
+
 		return Token::tok_number;
 	}
-	
+
 
 	if (LastChar == 0x27A1) {
 		LastChar = getNextUnicode();
 		return Token::tok_move;
 	}
-	if (LastChar == 0x21A9) {
+	if (LastChar == 0x21BA) {
 		LastChar = getNextUnicode();
 		return Token::tok_turn_left;
 	}
@@ -92,15 +92,15 @@ int getTok() {
 		LastChar = getNextUnicode();
 		return Token::tok_front_blocked;
 	}
-	
+
 	if (LastChar == '#') {
 		// Comment until end of line.
 		do LastChar = getNextUnicode();
 		while (LastChar != EOF && LastChar != '\n' && LastChar != '\r');
-		
+
 		if (LastChar != EOF) return getTok();
 	}
-	
+
 	int ThisChar = LastChar;
 	LastChar = getNextUnicode();
 	return ThisChar;
