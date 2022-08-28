@@ -1,14 +1,13 @@
 #include <iostream>
 #include <cctype>
-#include <vector>
 #include <cassert>
-#include "lexer.h"
+#include "lexer.hpp"
 
 // Returns a 4-byte integer representing the unicode value of the next character
-static int getNextUnicode() {
+int getNextUnicode() {
 	int output = 0;
 	int thisChar = getchar();
-	
+
 	if (thisChar == EOF) return thisChar;
 
 	if (thisChar >> 7 == 0) return thisChar;
@@ -31,47 +30,78 @@ static int getNextUnicode() {
 		output <<= 6;
 		thisChar = getchar();
 		assert(thisChar != EOF);
+		assert(thisChar >> 6 == 0x2);
 		output += thisChar & 0x3F;
 	}
 
 	return output;
 }
 
-// This contains the numeric value of a integer if getTok == tok_number
 int numVal;
 
 int getTok() {
-	int thisChar = getNextUnicode();
-	
-	while(isspace(thisChar))
-		thisChar = getNextUnicode();
-	
-	if (thisChar == EOF)
+	static int LastChar = ' ';
+
+	// TODO: may add more whitespace characters in this condition in the future
+	// We aren't using isspace function here because isspace doesn't support
+	// unicode
+	while(LastChar == ' ' || LastChar == '\n' || LastChar == '\t'
+			|| LastChar == '\r' || LastChar == '\v' || LastChar == '\f') {
+		LastChar = getNextUnicode();
+	}
+
+	if (LastChar == EOF)
 		return Token::tok_eof;
-		
-	if (isdigit(thisChar)) {
+
+	if (LastChar >= '0' && LastChar <= '9') {
 		numVal = 0;
 		do {
-			numVal = numVal * 10 + (thisChar - '0');
-			thisChar = getNextUnicode();
-		} while (isdigit(thisChar));
-		
+			numVal = numVal * 10 + (LastChar - '0');
+			LastChar = getNextUnicode();
+		} while (LastChar >= '0' && LastChar <= '9');
+
 		return Token::tok_number;
 	}
-	
-	if (thisChar == '#') {
-		// Comment until end of line.
-		do thisChar = getchar();
-		while (thisChar != EOF && thisChar != '\n' && thisChar != '\r');
-		
-		if (thisChar != EOF) return getTok();
+
+
+	if (LastChar == 0x27A1) {
+		LastChar = getNextUnicode();
+		return Token::tok_move;
 	}
-	
-	if (thisChar == 0x27A1) return Token::tok_move;
-	if (thisChar == 0x21A9) return Token::tok_turn_left;
-	if (thisChar == 0x1F914) return Token::tok_if;
-	if (thisChar == 0x1F641) return Token::tok_else;
-	if (thisChar == 0x1F504) return Token::tok_while;
-	if (thisChar == 0x1F6AB) return Token::tok_not;
-	if (thisChar == 0x1F9F1) return Token::tok_front_blocked;
+	if (LastChar == 0x21BA) {
+		LastChar = getNextUnicode();
+		return Token::tok_turn_left;
+	}
+	if (LastChar == 0x1F914) {
+		LastChar = getNextUnicode();
+		return Token::tok_if;
+	}
+	if (LastChar == 0x1F641) {
+		LastChar = getNextUnicode();
+		return Token::tok_else;
+	}
+	if (LastChar == 0x1F504) {
+		LastChar = getNextUnicode();
+		return Token::tok_while;
+	}
+	if (LastChar == 0x1F6AB) {
+		LastChar = getNextUnicode();
+		return Token::tok_not;
+	}
+	if (LastChar == 0x1F9F1) {
+		LastChar = getNextUnicode();
+		return Token::tok_front_blocked;
+	}
+
+	if (LastChar == '#') {
+		// Comment until end of line.
+		do LastChar = getNextUnicode();
+		while (LastChar != EOF && LastChar != '\n' && LastChar != '\r');
+
+		if (LastChar != EOF) return getTok();
+	}
+
+	int ThisChar = LastChar;
+	LastChar = getNextUnicode();
+	return ThisChar;
 }

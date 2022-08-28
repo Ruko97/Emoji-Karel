@@ -1,0 +1,32 @@
+action ::= ➡ 
+	|  ↩
+	|  ifstmt
+	|  whilestmt
+
+block ::= action+
+
+notexpr ::= 🚫 conditional
+frontblkexpr ::= 🧱
+
+conditional ::= frontblkexpr 
+	     | notexpr
+	     | binarycond
+	     | '(' conditional ')'
+
+binarycond ::= conditional '&' conditional
+	    |  conditional '|' conditional
+
+NOTE: THERE IS PROBABILITY THAT WE MIGHT NOT NEED MATCHEDIF & OPENIF
+
+matchedif ::= 🤔 '(' conditional ')' '{' matchedif '}' 🙁 '{' matchedif '}' 
+	   |  block
+openif    ::= 🤔 '(' conditional ')' '{' block '}'
+	   |  🤔 '(' conditional ')' '{' matchedif '}' 🙁 '{' openif '}'
+
+ifstmt ::= matchedif
+	|  openif
+
+loopstmt ::= 🔄 '(' condition ')' '{' block '}'
+	  |  🔄 '(' tok_number ')' '{' block '}'
+
+program ::= block

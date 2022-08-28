@@ -1,0 +1,7 @@
+# Program that makes karel move around the edge of the board once
+🔄 (4) {
+    🔄 (🚫 🧱) {
+        ➡
+    }
+    ↺
+}

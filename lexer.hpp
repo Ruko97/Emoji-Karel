@@ -18,5 +18,8 @@ enum Token {
 	tok_number = -9
 };
 
-static int getNextUnicode();
+// This contains the numeric value of a integer if getTok == tok_number
+extern int numVal;
+
+int getNextUnicode();
 int getTok();
