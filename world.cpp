@@ -1,9 +1,13 @@
+#include <stack>
+
 #include "world.hpp"
+
+extern Box World[WORLDSIZE][WORLDSIZE];
 
 void Karel::reset() {
     i = WORLDSIZE-1;
     j = 0;
-    orientation = right;
+    direction = right;
 
     pc = 0;    // or maybe 1, not sure
     accumulator = 0, counter = 0;
