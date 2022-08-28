@@ -50,6 +50,8 @@ class Karel {
 
     char *error_msg;
 
+    std::vector<std::string> instructions;
+
     int pc;    // program counter
     unsigned int accumulator, counter;    // counter is the counter register
     std::stack<unsigned int> accumulator_stack,
@@ -71,9 +73,10 @@ class Karel {
     void jce(int count, int offset);
     void inc();
 public:
-    Karel() { reset(); }
+    Karel(std::vector<std::string> &instructions)
+            : instructions(std::move(instructions)) { reset(); }
     void reset();
-    bool executeNextInstruction(std::istream &in);
+    bool executeNextInstruction();
     const char* getErrorMessage() { return error_msg; }
 };
 
