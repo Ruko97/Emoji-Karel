@@ -9,8 +9,10 @@ MOVE                Moves karel once step forward
 TURNLEFT            Turns karel left
 FRONTBLOCKED        Sets accumulator to 1 if front blocked, 0 otherwise
 NOT                 Negates the value in the accumulator
-PUSH                Pushes current value in accumulator to accumulator's stack
-POP                 Pops the top value from the stack
+PUSH                Pushes current value in accumulator to accumulator's stack,
+                    doesn't modify the value in accumulator
+POP                 Pops the top value from the stack, doesn't set accumulator
+                    to it
 AND                 Runs logical-and operator on accumulator and top of stack
 OR                  Runs logical-or operator on accumulator and top of stack
 JZ $offset          Jumps $offset instructions if value in accumulator is 0

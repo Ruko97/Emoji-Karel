@@ -42,7 +42,7 @@ struct Box {
 //      i          j
 Box World[WORLDSIZE][WORLDSIZE];
 
-enum Direction { top, bottom, left, right };
+enum Direction { top = 0, left, bottom, right };
 
 class Karel {
     int i, j;
@@ -54,8 +54,7 @@ class Karel {
 
     int pc;    // program counter
     unsigned int accumulator, counter;    // counter is the counter register
-    std::stack<unsigned int> accumulator_stack,
-        counter_stack;
+    std::stack<unsigned int> accumulator_stack, counter_stack;
 
     // List of all the instructions Karel can execute
     bool move();        // only the move instruction can result in an error
@@ -72,6 +71,8 @@ class Karel {
     void popcount();
     void jce(int count, int offset);
     void inc();
+    void start();
+    void end();
 public:
     Karel(std::vector<std::string> &instructions)
             : instructions(std::move(instructions)) { reset(); }
