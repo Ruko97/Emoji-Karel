@@ -34,3 +34,7 @@
 # Output txt files
 *.output
 
+# test/sfml
+test/sfml
+
+
