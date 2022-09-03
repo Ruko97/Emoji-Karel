@@ -14,6 +14,9 @@ dump.o: ast.hpp dump.cpp lexer.o
 parser.o: parser.hpp parser.cpp lexer.o
 	$(CC) $(CFLAGS) -c parser.cpp
 
+instructions.o: instructions.cpp world.hpp
+	$(CC) $(CFLAGS) -c instructions.cpp
+
 world.o: world.cpp world.hpp
 	$(CC) $(CFLAGS) -c world.cpp
 
