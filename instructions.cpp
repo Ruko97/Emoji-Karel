@@ -4,7 +4,7 @@
 bool Karel::move() {
     assert(i >= 0 && i < WORLDSIZE && j >= 0 && j < WORLDSIZE);
 
-    const char *error_msg = "Error: can't move in the direction specified";
+    char *const error_msg = "Error: can't move in the direction specified";
 
     switch (direction) {
     case top:
@@ -47,7 +47,7 @@ bool Karel::move() {
 }
 
 void Karel::turnLeft() {
-    direction = (direction + 1) % 4;
+    direction = (enum Direction) ((direction + 1) % 4);
 }
 
 void Karel::frontBlocked() {

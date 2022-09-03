@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 #include <stack>
 
 #define WORLDSIZE 8
@@ -74,6 +75,7 @@ class Karel {
     void start();
     void end();
 public:
+    Karel() { reset(); }
     Karel(std::vector<std::string> &instructions)
             : instructions(std::move(instructions)) { reset(); }
     void reset();
