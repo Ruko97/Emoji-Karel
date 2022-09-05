@@ -5,6 +5,8 @@
 int main(int argc, char **argv) {
     sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Karel World Sample");
 
+    createDefaultWorld();
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -12,7 +14,7 @@ int main(int argc, char **argv) {
                 window.close();
             }
         }
-        window.clear(sf::Color::White);
+        window.clear(sf::Color::Black);
         renderWorld(window);
         window.display();
     }
