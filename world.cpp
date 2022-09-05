@@ -231,7 +231,7 @@ void createDefaultWorld() {
     }
     for (int j = 0; j < WORLDSIZE; j++) {
         World[0][j].top = 1;
-        World[0][WORLDSIZE-1].bottom = 1;
+        World[WORLDSIZE-1][j].bottom = 1;
     }
 
     karel.reset();

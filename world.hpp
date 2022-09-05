@@ -11,8 +11,10 @@
 
 #define BOXSIZE 100
 #define PADDING 10
-#define WINDOWWIDTH (BOXSIZE * WORLDSIZE + PADDING)
-#define WINDOWHEIGHT (BOXSIZE * WORLDSIZE + PADDING)
+
+// 2 * PADDING for padding on both sides (top and bottom; left and right)
+#define WINDOWWIDTH (BOXSIZE * WORLDSIZE + 2 * PADDING)
+#define WINDOWHEIGHT (BOXSIZE * WORLDSIZE + 2 * PADDING)
 
 /*
         Structure of the world:
