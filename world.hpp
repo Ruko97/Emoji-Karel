@@ -4,7 +4,15 @@
 #include <vector>
 #include <stack>
 
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+
 #define WORLDSIZE 8
+
+#define BOXSIZE 100
+#define PADDING 10
+#define WINDOWWIDTH (BOXSIZE * WORLDSIZE + PADDING)
+#define WINDOWHEIGHT (BOXSIZE * WORLDSIZE + PADDING)
 
 /*
         Structure of the world:
@@ -40,8 +48,8 @@ struct Box {
 
 // Here i indicates row and j indicates column;
 //
-//      i          j
-Box World[WORLDSIZE][WORLDSIZE];
+//                  i          j
+static Box World[WORLDSIZE][WORLDSIZE];
 
 enum Direction { top = 0, left, bottom, right };
 
@@ -83,6 +91,9 @@ public:
     const char* getErrorMessage() { return error_msg; }
 };
 
-Karel karel;
+static Karel karel;
 
 void createDefaultWorld();
+
+void renderBox(sf::RenderWindow &window, int i, int j);
+void renderWorld(sf::RenderWindow &window);

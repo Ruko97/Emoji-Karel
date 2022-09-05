@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -g -w -Wall
 INCLUDE = -I.
+SFML_LIBRARIES = -lsfml-graphics -lsfml-window -lsfml-system
 
 lexer.o: lexer.hpp lexer.cpp
 	$(CC) $(CFLAGS) -c lexer.cpp
@@ -13,9 +14,6 @@ dump.o: ast.hpp dump.cpp lexer.o
 
 parser.o: parser.hpp parser.cpp lexer.o
 	$(CC) $(CFLAGS) -c parser.cpp
-
-instructions.o: instructions.cpp world.hpp
-	$(CC) $(CFLAGS) -c instructions.cpp
 
 world.o: world.cpp world.hpp
 	$(CC) $(CFLAGS) -c world.cpp
@@ -31,4 +29,7 @@ test_codegen: lexer.o dump.o codegen.o parser.o ast.hpp util.hpp test/codegen/te
 
 showTokens.out: lexer.o dump.o codegen.o parser.o ast.hpp test/lexer/showTokens.cpp
 	$(CC) $(CFLAGS) $^ -o test/lexer/showTokens.out $(INCLUDE)
+
+test_basicRendering: world.o world.hpp test/renderer/test1.cpp
+	$(CC) $(CFLAGS) $^ -o test/renderer/test1.out $(INCLUDE) $(SFML_LIBRARIES)
 
