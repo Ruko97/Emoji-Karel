@@ -58,10 +58,13 @@ bool Karel::move() {
             return true;
         }
     }
+
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::turnLeft() {
     direction = (enum Direction) ((direction + 1) % 4);
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::frontBlocked() {
@@ -83,37 +86,44 @@ void Karel::frontBlocked() {
         else accumulator = 0;
         break;
     }
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::notInstruction() {
     assert(accumulator == 0 || accumulator == 1);
     accumulator = 1 - accumulator;
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::push() {
     accumulator_stack.push(accumulator);
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::pop() {
     assert (!accumulator_stack.empty());
     accumulator_stack.pop();
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::andInstruction() {
     assert(accumulator == 0 || accumulator == 1);
     accumulator = accumulator & accumulator_stack.top();
     assert(accumulator == 0 || accumulator == 1);
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::orInstruction() {
     assert(accumulator == 0 || accumulator == 1);
     accumulator = accumulator | accumulator_stack.top();
     assert(accumulator == 0 || accumulator == 1);
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::jz(int offset) {
     assert(accumulator == 0 || accumulator == 1);
     if (accumulator == 0) pc += offset;
+    else pc++;
     assert(pc >= 0 && pc < instructions.size());
 }
 
@@ -125,25 +135,33 @@ void Karel::jmp(int offset) {
 void Karel::pushcount() {
     counter_stack.push(counter);
     counter = 0;
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::popcount() {
     assert(!counter_stack.empty());
     counter = accumulator_stack.top();
     accumulator_stack.pop();
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::jce(int count, int offset) {
     if (counter == count) pc += offset;
     assert(pc >= 0 && pc < instructions.size());
+    pc++;           // Move program counter to next instruction
 }
 
 void Karel::inc() {
     counter++;
+    pc++;           // Move program counter to next instruction
 }
 
-void Karel::start() { reset(); }
+void Karel::start() {
+    reset();
+    pc++;           // Move program counter to next instruction
+}
 void Karel::end() {}    // TODO: might need to fill something here
+                        // No jumping here, since this is end of program
 
 
 /// Return true if instruction executed successfully, false if error
@@ -206,6 +224,7 @@ KarelState Karel::executeNextInstruction() {
         else if (OPCODEEQUALS(START)) {
             assert(pc == 0);        // Asserting pc is 0 here
             assert(state == idle);  // Just adding a check here
+            start();
         }
         else if (OPCODEEQUALS(END)) {
             assert(pc == instructions.size()-1);  // Asserting pc is at end
@@ -223,7 +242,6 @@ KarelState Karel::executeNextInstruction() {
         state = thought;
     }
 
-    pc++;           // Move program counter to next instruction
     return state;   // All Ok, so return true
 }
 
@@ -232,6 +250,7 @@ void Karel::reset() {
     j = 0;
     direction = right;
     state = idle;
+    error_msg = NULL;
 
     pc = 0;
     accumulator = 0, counter = 0;
@@ -343,16 +362,22 @@ void Karel::render(sf::RenderWindow &window) {
             ((float) KARELHEIGHT) / KARELIMAGEHEIGHT
         );
 
+        karelSprite.setOrigin(KARELIMAGEWIDTH * 0.5f, KARELIMAGEHEIGHT * 0.5f);
+
         spriteSetup = false;    // Set spriteSetup to be false
     }
 
     // Move the karel sprite to the required location
     // The 0.1 comes from 0.1 = 0.2 / 2 and because Karel's
     // image size = 0.8 * BOXSIZE
-    const float starty = PADDING + BOXSIZE * i + 0.1 * BOXSIZE;
-    const float startx = PADDING + BOXSIZE * j + 0.1 * BOXSIZE;
+    const float starty = PADDING + BOXSIZE * i + 0.1 * BOXSIZE
+            + 0.5 * KARELHEIGHT;
+    const float startx = PADDING + BOXSIZE * j + 0.1 * BOXSIZE
+            + 0.5 * KARELWIDTH;
 
     karelSprite.setPosition(startx, starty);
+
+    karelSprite.rotate((int) direction * -90.f);
 
     window.draw(karelSprite);
 }
@@ -373,4 +398,19 @@ KarelState Karel::executeUntilMovement() {
 
     assert(state == moved || state == error || state == KarelState::end);
     return state;
+}
+
+void Karel::dump() {
+    if (!error_msg) {
+        std::cerr << "ERROR: " << error_msg << std::endl;
+    }
+    std::cout << "PC: " << pc << std::endl;
+    std::cout << "Current Instruction: " << instructions[pc] << std::endl;
+    std::cout << "Karel's current state: " << state << std::endl;
+    std::cout << "Karel's current direction: " << state << std::endl;
+    std::cout << "Karel's location: [" << i << " row, " << j << " column]"
+              << std::endl;
+    std::cout << "Accumulator: " << accumulator << std::endl;
+    std::cout << "Counter: " << counter << std::endl;
+    std::cout << std::endl;
 }

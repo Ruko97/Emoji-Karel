@@ -63,7 +63,7 @@ struct Box {
 //                  i          j
 static Box World[WORLDSIZE][WORLDSIZE];
 
-enum Direction { top = 0, left, bottom, right };
+enum Direction { right = 0, top, left, bottom };
 enum KarelState {
     error = -1, // There was some error in the last instruction
     idle,       // Karel hasn't started yet
@@ -113,6 +113,8 @@ public:
 
     /// Execute Karel::executeNextInstruction until a move or turnLeft has run
     KarelState executeUntilMovement();
+
+    void dump();
 };
 
 void createDefaultWorld();
