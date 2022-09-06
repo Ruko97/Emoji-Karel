@@ -267,10 +267,55 @@ void renderBox(sf::RenderWindow &window, int i, int j) {
     }
 }
 
+void Karel::render(sf::RenderWindow &window) {
+    // Here, karelTexture and karelSprites are singletons, that can be
+    // repeatedly used in the program instead of creating the sprite
+    // over and over again whenever renderKarel is called
+
+    static bool spriteSetup = false;    // a flag to make sure karelTexture
+                                        // and karelSprite are setup only once
+    static bool anyError = false;
+
+    static sf::Texture karelTexture;
+    static sf::Sprite karelSprite;
+
+    if (anyError) return;
+
+    if (!spriteSetup) {
+        if (!karelTexture.loadFromFile("karelLarge.png",
+                    sf::IntRect(0, 0, KARELIMAGEWIDTH, KARELIMAGEHEIGHT))) {
+            fprintf(stderr, "ERROR: Karel image not found!!");
+            anyError = true;
+            return;
+        }
+
+        karelSprite.setTexture(karelTexture);
+
+        // Scale karelSprite from the size of its image to the size we need
+        karelSprite.setScale(
+            ((float) KARELWIDTH) / KARELIMAGEWIDTH,
+            ((float) KARELHEIGHT) / KARELIMAGEHEIGHT
+        );
+
+        spriteSetup = false;    // Set spriteSetup to be false
+    }
+
+    // Move the karel sprite to the required location
+    // The 0.1 comes from 0.1 = 0.2 / 2 and because Karel's
+    // image size = 0.8 * BOXSIZE
+    const float starty = PADDING + BOXSIZE * i + 0.1 * BOXSIZE;
+    const float startx = PADDING + BOXSIZE * j + 0.1 * BOXSIZE;
+
+    karelSprite.setPosition(startx, starty);
+
+    window.draw(karelSprite);
+}
+
 void renderWorld(sf::RenderWindow &window) {
     for (int i = 0; i < WORLDSIZE; i++) {
         for (int j = 0; j < WORLDSIZE; j++) {
             renderBox(window, i, j);
         }
     }
+    karel.render(window);
 }

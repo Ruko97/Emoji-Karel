@@ -16,6 +16,13 @@
 #define WINDOWWIDTH (BOXSIZE * WORLDSIZE + 2 * PADDING)
 #define WINDOWHEIGHT (BOXSIZE * WORLDSIZE + 2 * PADDING)
 
+#define KARELIMAGEWIDTH 188
+#define KARELIMAGEHEIGHT 188
+
+#define KARELWIDTH (BOXSIZE * 4 / 5)
+#define KARELHEIGHT (BOXSIZE * 4 / 5)
+
+
 /*
         Structure of the world:
 
@@ -91,6 +98,7 @@ public:
     void reset();
     bool executeNextInstruction();
     const char* getErrorMessage() { return error_msg; }
+    void render(sf::RenderWindow &window);
 };
 
 static Karel karel;
