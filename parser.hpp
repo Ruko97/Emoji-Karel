@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <memory>
 #include <map>
+#include <cctype>
 #include "lexer.hpp"
 #include "ast.hpp"
 
