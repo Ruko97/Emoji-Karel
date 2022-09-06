@@ -1,11 +1,17 @@
 #include <SFML/Window.hpp>
 
+#include <vector>
+#include <string>
+
 #include "world.hpp"
 
 int main(int argc, char **argv) {
-    sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Karel World Sample");
+    sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT),
+                            "Karel World Sample");
 
     createDefaultWorld();
+    std::vector<std::string>instructions;
+    Karel karel(instructions);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -15,7 +21,7 @@ int main(int argc, char **argv) {
             }
         }
         window.clear(sf::Color::Black);
-        renderWorld(window);
+        renderWorld(window, karel);
         window.display();
     }
 
