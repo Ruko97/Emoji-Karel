@@ -96,9 +96,14 @@ public:
     Karel(std::vector<std::string> &instructions)
             : instructions(std::move(instructions)) { reset(); }
     void reset();
-    bool executeNextInstruction();
+    /// isMovement is set to true if the instruction is move or turnLeft
+    /// otherwise it's set to false
+    bool executeNextInstruction(bool &isMovement);
     const char* getErrorMessage() { return error_msg; }
     void render(sf::RenderWindow &window);
+
+    /// Execute Karel::executeNextInstruction until a move or turnLeft has run
+    bool executeUntilMovement();
 };
 
 static Karel karel;
@@ -107,3 +112,5 @@ void createDefaultWorld();
 
 void renderBox(sf::RenderWindow &window, int i, int j);
 void renderWorld(sf::RenderWindow &window);
+
+

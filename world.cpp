@@ -149,7 +149,9 @@ void Karel::end() {}    // TODO: might need to fill something here
 
 
 /// Return true if instruction executed successfully, false if error
-bool Karel::executeNextInstruction() {
+/// Boolean isMovement is set to true if the instruction was move or turnLeft,
+/// is set to false otherwise
+bool Karel::executeNextInstruction(bool &isMovement) {
     std::string currentInstruction = instructions[pc];
 
     // currentInstructionCstr is just the string currentInstruction
@@ -163,44 +165,53 @@ bool Karel::executeNextInstruction() {
 
     if (OPCODEEQUALS(MOVE)) {
         bool result = move();
+        isMovement = true;
         return result;
     }
-    else if (OPCODEEQUALS(TURNLEFT)) turnLeft();
-    else if (OPCODEEQUALS(FRONTBLOCKED)) frontBlocked();
-    else if (OPCODEEQUALS(NOT)) notInstruction();
-    else if (OPCODEEQUALS(PUSH)) push();
-    else if (OPCODEEQUALS(POP)) pop();
-    else if (OPCODEEQUALS(AND)) andInstruction();
-    else if (OPCODEEQUALS(OR)) orInstruction();
-    else if (OPCODEEQUALS(JZ)) {
-        char *offsetStr = strtok(NULL, " ");
-        assert(offsetStr != NULL && strcmp(offsetStr, "\n") != 0);
-        int offset = atoi(offsetStr);
-        jz(offset);
-    }
-    else if (OPCODEEQUALS(JMP)) {
-        char *offsetStr = strtok(NULL, " ");
-        assert(offsetStr != NULL && strcmp(offsetStr, "\n") != 0);
-        int offset = atoi(offsetStr);
-        jmp(offset);
-    }
-    else if (OPCODEEQUALS(PUSHCOUNT)) pushcount();
-    else if (OPCODEEQUALS(POPCOUNT)) popcount();
-    else if (OPCODEEQUALS(JCE)) {
-        char *countStr = strtok(NULL, " ");
-        assert(countStr != NULL && strcmp(countStr, "\n") != 0);
-        int count = atoi(countStr);
-
-        char *offsetStr = strtok(NULL, " ");
-        assert(offsetStr != NULL && strcmp(offsetStr, "\n") != 0);
-        int offset = atoi(offsetStr);
-
-        jce(count, offset);
+    else if (OPCODEEQUALS(TURNLEFT)) {
+        isMovement = true;
+        turnLeft();
     }
     else {
-        // ERROR
-        fprintf(stderr, "ERROR: NOT SUPPOSED TO REACH THIS LINE!!");
-        return false;
+        // In all the remaining cases, isMovement will be set to false
+        isMovement = false;
+
+        if (OPCODEEQUALS(FRONTBLOCKED)) frontBlocked();
+        else if (OPCODEEQUALS(NOT)) notInstruction();
+        else if (OPCODEEQUALS(PUSH)) push();
+        else if (OPCODEEQUALS(POP)) pop();
+        else if (OPCODEEQUALS(AND)) andInstruction();
+        else if (OPCODEEQUALS(OR)) orInstruction();
+        else if (OPCODEEQUALS(JZ)) {
+            char *offsetStr = strtok(NULL, " ");
+            assert(offsetStr != NULL && strcmp(offsetStr, "\n") != 0);
+            int offset = atoi(offsetStr);
+            jz(offset);
+        }
+        else if (OPCODEEQUALS(JMP)) {
+            char *offsetStr = strtok(NULL, " ");
+            assert(offsetStr != NULL && strcmp(offsetStr, "\n") != 0);
+            int offset = atoi(offsetStr);
+            jmp(offset);
+        }
+        else if (OPCODEEQUALS(PUSHCOUNT)) pushcount();
+        else if (OPCODEEQUALS(POPCOUNT)) popcount();
+        else if (OPCODEEQUALS(JCE)) {
+            char *countStr = strtok(NULL, " ");
+            assert(countStr != NULL && strcmp(countStr, "\n") != 0);
+            int count = atoi(countStr);
+
+            char *offsetStr = strtok(NULL, " ");
+            assert(offsetStr != NULL && strcmp(offsetStr, "\n") != 0);
+            int offset = atoi(offsetStr);
+
+            jce(count, offset);
+        }
+        else {
+            // ERROR
+            fprintf(stderr, "ERROR: NOT SUPPOSED TO REACH THIS LINE!!");
+            return false;
+        }
     }
 
     return true;    // All Ok, so return true
@@ -318,4 +329,15 @@ void renderWorld(sf::RenderWindow &window) {
         }
     }
     karel.render(window);
+}
+
+bool Karel::executeUntilMovement() {
+    bool isMovement = false;
+    bool result = false;
+
+    do {
+        result |= executeNextInstruction(isMovement);
+    } while (!isMovement);
+
+    return result;
 }
