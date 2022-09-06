@@ -354,7 +354,7 @@ void Karel::render(sf::RenderWindow &window) {
     if (anyError) return;
 
     if (!spriteSetup) {
-        if (!karelTexture.loadFromFile("karelLarge.png",
+        if (!karelTexture.loadFromFile(KARELIMAGENAME,
                     sf::IntRect(0, 0, KARELIMAGEWIDTH, KARELIMAGEHEIGHT))) {
             fprintf(stderr, "ERROR: Karel image not found!!");
             anyError = true;
@@ -400,22 +400,41 @@ void renderWorld(sf::RenderWindow &window, Karel &karel) {
 }
 
 void renderText(sf::RenderWindow &window, Karel &karel) {
-    static sf::Text text;
-
     static const float startx = PADDING;
     static const float starty = PADDING + WORLDSIZE * BOXSIZE + PADDING;
+
+    static bool textSetup = false;
+    static bool anyError = false;
+
+    static sf::Font font;
+    static sf::Text text;
+
+    if (anyError) return;
+
+    if (!textSetup) {
+        if (!font.loadFromFile(FONTNAME)) {
+            std::cerr << "ERROR: Required font named " << FONTNAME
+                      << " not found" << std::endl;
+            anyError = true;
+            return;
+        }
+
+        text.setFont(font);
+        text.setPosition(startx, starty);
+        text.setCharacterSize(TEXTSIZE);
+
+        textSetup = false;
+    }
 
     if (karel.getErrorMessage() != NULL) {
         text.setFillColor(sf::Color::Red);
         text.setString(karel.getErrorMessage());
-        text.setPosition(startx, starty);
         window.draw(text);
     }
 
     if (karel.getState() == KarelState::end) {
         text.setFillColor(sf::Color::Green);
         text.setString("Karel exectured successfully");
-        text.setPosition(startx, starty);
         window.draw(text);
     }
 }

@@ -18,13 +18,20 @@
 
 // 2 * PADDING for padding on both sides (top and bottom; left and right)
 #define WINDOWWIDTH (BOXSIZE * WORLDSIZE + 2 * PADDING)
-#define WINDOWHEIGHT (BOXSIZE * WORLDSIZE + 2 * PADDING + FOOTERHEIGHT)
+// 3 * PADDING for paddding on both sides of the world and one after
+// the footer text
+#define WINDOWHEIGHT (BOXSIZE * WORLDSIZE + 3 * PADDING + FOOTERHEIGHT)
 
 #define KARELIMAGEWIDTH 188
 #define KARELIMAGEHEIGHT 188
 
 #define KARELWIDTH (BOXSIZE * 4 / 5)
 #define KARELHEIGHT (BOXSIZE * 4 / 5)
+
+#define KARELIMAGENAME "assets/karelLarge.png"
+#define FONTNAME "assets/arial.ttf"
+
+#define TEXTSIZE 40
 
 
 /*
