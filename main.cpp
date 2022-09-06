@@ -34,5 +34,39 @@ int main(int argc, char **argv) {
             instructions.push_back(instruction);
     }
 
+    createDefaultWorld();
+    Karel karel(instructions);
+
+    sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT),
+                            "Karel world");
+    window.setKeyRepeatEnabled(false);
+    bool finishedExecution = false;
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) window.close();
+            else if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Space) {
+                    if (!finishedExecution) {
+                        karel.executeUntilMovement();
+                        if (karel.getState() == end) finishedExecution = true;
+                        else if (karel.getState() == error) {
+                            // TODO: enter error handling code here
+                        }
+                    } else {
+                        // Finished execution, so close
+                        // TODO: also show text showing that karel executed OK
+                        window.close();
+                    }
+                }
+            }
+        }
+
+        window.clear(sf::Color::Black);
+        renderWorld(window, karel);
+        window.display();
+    }
+
     return 0;
 }
