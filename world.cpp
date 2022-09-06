@@ -20,6 +20,9 @@ bool Karel::move() {
 
     char *const error_msg = "Error: can't move in the direction specified";
 
+    pc++;           // Move program counter to next instruction
+                    // Doing early cause returning is involved here
+
     switch (direction) {
     case top:
         if (i == 0 || World[i-1][j].bottom) {
@@ -58,8 +61,6 @@ bool Karel::move() {
             return true;
         }
     }
-
-    pc++;           // Move program counter to next instruction
 }
 
 void Karel::turnLeft() {
@@ -140,15 +141,15 @@ void Karel::pushcount() {
 
 void Karel::popcount() {
     assert(!counter_stack.empty());
-    counter = accumulator_stack.top();
-    accumulator_stack.pop();
+    counter = counter_stack.top();
+    counter_stack.pop();
     pc++;           // Move program counter to next instruction
 }
 
 void Karel::jce(int count, int offset) {
     if (counter == count) pc += offset;
+    else pc++;      // Move program counter to next instruction
     assert(pc >= 0 && pc < instructions.size());
-    pc++;           // Move program counter to next instruction
 }
 
 void Karel::inc() {
@@ -160,8 +161,11 @@ void Karel::start() {
     reset();
     pc++;           // Move program counter to next instruction
 }
-void Karel::end() {}    // TODO: might need to fill something here
-                        // No jumping here, since this is end of program
+
+void Karel::end() {
+    // TODO: might need to fill something here
+    // No jumping here, since this is end of program
+}
 
 
 /// Return true if instruction executed successfully, false if error
@@ -241,6 +245,8 @@ KarelState Karel::executeNextInstruction() {
 
         state = thought;
     }
+
+    // dump();
 
     return state;   // All Ok, so return true
 }
