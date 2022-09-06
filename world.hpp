@@ -64,10 +64,18 @@ struct Box {
 static Box World[WORLDSIZE][WORLDSIZE];
 
 enum Direction { top = 0, left, bottom, right };
+enum KarelState {
+    error = -1, // There was some error in the last instruction
+    idle,       // Karel hasn't started yet
+    moved,      // Karel moved in the last instruction
+    thought,    // Karel executee a instruction but didn't move
+    end,        // Karel finished executing successfully
+};
 
 class Karel {
     int i, j;
     Direction direction;
+    KarelState state;
 
     char *error_msg;
 
@@ -98,14 +106,13 @@ public:
     Karel(std::vector<std::string> &instructions)
             : instructions(std::move(instructions)) { reset(); }
     void reset();
-    /// isMovement is set to true if the instruction is move or turnLeft
-    /// otherwise it's set to false
-    bool executeNextInstruction(bool &isMovement);
+    KarelState executeNextInstruction();
     const char* getErrorMessage() { return error_msg; }
+    KarelState getState() { return state; }
     void render(sf::RenderWindow &window);
 
     /// Execute Karel::executeNextInstruction until a move or turnLeft has run
-    bool executeUntilMovement();
+    KarelState executeUntilMovement();
 };
 
 void createDefaultWorld();

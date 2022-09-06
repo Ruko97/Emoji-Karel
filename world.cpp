@@ -149,7 +149,7 @@ void Karel::end() {}    // TODO: might need to fill something here
 /// Return true if instruction executed successfully, false if error
 /// Boolean isMovement is set to true if the instruction was move or turnLeft,
 /// is set to false otherwise
-bool Karel::executeNextInstruction(bool &isMovement) {
+KarelState Karel::executeNextInstruction() {
     std::string currentInstruction = instructions[pc];
 
     // currentInstructionCstr is just the string currentInstruction
@@ -163,17 +163,14 @@ bool Karel::executeNextInstruction(bool &isMovement) {
 
     if (OPCODEEQUALS(MOVE)) {
         bool result = move();
-        isMovement = true;
-        return result;
+        if (result) state = moved;
+        else state = error;
     }
     else if (OPCODEEQUALS(TURNLEFT)) {
-        isMovement = true;
         turnLeft();
+        state = moved;
     }
     else {
-        // In all the remaining cases, isMovement will be set to false
-        isMovement = false;
-
         if (OPCODEEQUALS(FRONTBLOCKED)) frontBlocked();
         else if (OPCODEEQUALS(NOT)) notInstruction();
         else if (OPCODEEQUALS(PUSH)) push();
@@ -205,22 +202,37 @@ bool Karel::executeNextInstruction(bool &isMovement) {
 
             jce(count, offset);
         }
+        else if (OPCODEEQUALS(START)) {
+            assert(pc == 0);        // Asserting pc is 0 here
+            assert(state == idle);  // Just adding a check here
+        }
+        else if (OPCODEEQUALS(END)) {
+            assert(pc == instructions.size()-1);  // Asserting pc is at end
+            state = KarelState::end;
+            return state;   // We know the program has ended here, so there's
+                            // no need to increment pc here
+        }
         else {
             // ERROR
             fprintf(stderr, "ERROR: NOT SUPPOSED TO REACH THIS LINE!!");
-            return false;
+            state = error;
+            return state;
         }
+
+        state = thought;
     }
 
-    return true;    // All Ok, so return true
+    pc++;           // Move program counter to next instruction
+    return state;   // All Ok, so return true
 }
 
 void Karel::reset() {
     i = WORLDSIZE-1;
     j = 0;
     direction = right;
+    state = idle;
 
-    pc = 0;    // or maybe 1, not sure
+    pc = 0;
     accumulator = 0, counter = 0;
     while (!accumulator_stack.empty()) accumulator_stack.pop();
     while (!counter_stack.empty()) counter_stack.pop();
@@ -353,13 +365,11 @@ void renderWorld(sf::RenderWindow &window, Karel &karel) {
     karel.render(window);
 }
 
-bool Karel::executeUntilMovement() {
-    bool isMovement = false;
-    bool result = false;
-
+KarelState Karel::executeUntilMovement() {
     do {
-        result |= executeNextInstruction(isMovement);
-    } while (!isMovement);
+        executeNextInstruction();
+    } while (state == thought || state == idle);
 
-    return result;
+    assert(state == moved || state == error || state == KarelState::end);
+    return state;
 }
