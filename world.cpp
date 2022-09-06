@@ -6,8 +6,6 @@
 
 #include "world.hpp"
 
-#define LINETHICKNESS 5.f
-
 extern Box World[WORLDSIZE][WORLDSIZE];
 
 
@@ -246,6 +244,30 @@ void createDefaultWorld() {
     }
 }
 
+
+void renderCrosshair(sf::RenderWindow &window, int i, int j) {
+    float startx = PADDING + BOXSIZE * j + (BOXSIZE * 0.5)
+            - (CROSSHAIRLENGTH * 0.5);
+    float starty = PADDING + BOXSIZE * i + (BOXSIZE * 0.5)
+            - (LINETHICKNESS * 0.5);
+
+    sf::RectangleShape horizontalLine(
+            sf::Vector2f(CROSSHAIRLENGTH, LINETHICKNESS));
+    horizontalLine.setPosition(startx, starty);
+    window.draw(horizontalLine);
+
+    startx = PADDING + BOXSIZE * j + (BOXSIZE * 0.5)
+            + (LINETHICKNESS * 0.5);
+    starty = PADDING + BOXSIZE * i + (BOXSIZE * 0.5)
+            - (CROSSHAIRLENGTH * 0.5);
+
+    sf::RectangleShape verticalLine(
+            sf::Vector2f(CROSSHAIRLENGTH, LINETHICKNESS));
+    verticalLine.setPosition(startx, starty);
+    verticalLine.rotate(90.f);
+    window.draw(verticalLine);
+}
+
 void renderBox(sf::RenderWindow &window, int i, int j) {
     const float starty = PADDING + BOXSIZE * i;
     const float startx = PADDING + BOXSIZE * j;
@@ -274,6 +296,8 @@ void renderBox(sf::RenderWindow &window, int i, int j) {
         rightLine.rotate(90.f);
         window.draw(rightLine);
     }
+
+    renderCrosshair(window, i, j);
 }
 
 void Karel::render(sf::RenderWindow &window) {

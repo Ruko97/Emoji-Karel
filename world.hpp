@@ -12,6 +12,9 @@
 #define BOXSIZE 100
 #define PADDING 10
 
+#define LINETHICKNESS 5.f
+#define CROSSHAIRLENGTH 15.f
+
 // 2 * PADDING for padding on both sides (top and bottom; left and right)
 #define WINDOWWIDTH (BOXSIZE * WORLDSIZE + 2 * PADDING)
 #define WINDOWHEIGHT (BOXSIZE * WORLDSIZE + 2 * PADDING)
@@ -109,5 +112,6 @@ void createDefaultWorld();
 
 void renderBox(sf::RenderWindow &window, int i, int j);
 void renderWorld(sf::RenderWindow &window, Karel &karel);
+void renderCrosshair(sf::RenderWindow &window, int i, int j);
 
 
