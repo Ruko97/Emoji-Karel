@@ -244,8 +244,6 @@ void createDefaultWorld() {
         World[0][j].top = 1;
         World[WORLDSIZE-1][j].bottom = 1;
     }
-
-    karel.reset();
 }
 
 void renderBox(sf::RenderWindow &window, int i, int j) {
@@ -322,7 +320,7 @@ void Karel::render(sf::RenderWindow &window) {
     window.draw(karelSprite);
 }
 
-void renderWorld(sf::RenderWindow &window) {
+void renderWorld(sf::RenderWindow &window, Karel &karel) {
     for (int i = 0; i < WORLDSIZE; i++) {
         for (int j = 0; j < WORLDSIZE; j++) {
             renderBox(window, i, j);

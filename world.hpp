@@ -92,7 +92,6 @@ class Karel {
     void start();
     void end();
 public:
-    Karel() { reset(); }
     Karel(std::vector<std::string> &instructions)
             : instructions(std::move(instructions)) { reset(); }
     void reset();
@@ -106,11 +105,9 @@ public:
     bool executeUntilMovement();
 };
 
-static Karel karel;
-
 void createDefaultWorld();
 
 void renderBox(sf::RenderWindow &window, int i, int j);
-void renderWorld(sf::RenderWindow &window);
+void renderWorld(sf::RenderWindow &window, Karel &karel);
 
 
