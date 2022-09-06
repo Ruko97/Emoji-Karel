@@ -202,6 +202,7 @@ KarelState Karel::executeNextInstruction() {
 
             jce(count, offset);
         }
+        else if (OPCODEEQUALS(INC)) inc();
         else if (OPCODEEQUALS(START)) {
             assert(pc == 0);        // Asserting pc is 0 here
             assert(state == idle);  // Just adding a check here
