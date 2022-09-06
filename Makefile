@@ -30,6 +30,9 @@ test_codegen: lexer.o dump.o codegen.o parser.o ast.hpp util.hpp test/codegen/te
 showTokens.out: lexer.o dump.o codegen.o parser.o ast.hpp test/lexer/showTokens.cpp
 	$(CC) $(CFLAGS) $^ -o test/lexer/showTokens.out $(INCLUDE)
 
-test_basicRendering: world.o world.hpp test/renderer/test1.cpp
+test_basicRendering: world.o test/renderer/test1.cpp
 	$(CC) $(CFLAGS) $^ -o test/renderer/test1.out $(INCLUDE) $(SFML_LIBRARIES)
+
+main.out: lexer.o dump.o parser.o codegen.o ast.hpp util.hpp world.o main.cpp
+	$(CC) $(CFLAGS) $^ -o main.out $(INCLUDE) $(SFML_LIBRARIES)
 
