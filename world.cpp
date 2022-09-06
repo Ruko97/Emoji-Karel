@@ -18,7 +18,8 @@ extern Box World[WORLDSIZE][WORLDSIZE];
 bool Karel::move() {
     assert(i >= 0 && i < WORLDSIZE && j >= 0 && j < WORLDSIZE);
 
-    char *const error_msg = "Error: can't move in the direction specified";
+    static char *const error_msg =
+            "Error: can't move in the direction specified";
 
     pc++;           // Move program counter to next instruction
                     // Doing early cause returning is involved here
@@ -395,6 +396,28 @@ void renderWorld(sf::RenderWindow &window, Karel &karel) {
         }
     }
     karel.render(window);
+    renderText(window, karel);
+}
+
+void renderText(sf::RenderWindow &window, Karel &karel) {
+    static sf::Text text;
+
+    static const float startx = PADDING;
+    static const float starty = PADDING + WORLDSIZE * BOXSIZE + PADDING;
+
+    if (karel.getErrorMessage() != NULL) {
+        text.setFillColor(sf::Color::Red);
+        text.setString(karel.getErrorMessage());
+        text.setPosition(startx, starty);
+        window.draw(text);
+    }
+
+    if (karel.getState() == KarelState::end) {
+        text.setFillColor(sf::Color::Green);
+        text.setString("Karel exectured successfully");
+        text.setPosition(startx, starty);
+        window.draw(text);
+    }
 }
 
 KarelState Karel::executeUntilMovement() {
