@@ -384,7 +384,7 @@ void Karel::render(sf::RenderWindow &window) {
 
     karelSprite.setPosition(startx, starty);
 
-    karelSprite.rotate((int) direction * -90.f);
+    karelSprite.setRotation((int) direction * -90.f);
 
     window.draw(karelSprite);
 }
