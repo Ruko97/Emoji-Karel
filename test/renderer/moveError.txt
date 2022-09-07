@@ -1,0 +1,4 @@
+# should give error since moving 16 time would move karel outside the world
+🔄 ( 16 ) {
+	➡
+}

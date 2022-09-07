@@ -53,6 +53,7 @@ int main(int argc, char **argv) {
                         if (karel.getState() == end) finishedExecution = true;
                         else if (karel.getState() == error) {
                             // TODO: enter error handling code here
+                            finishedExecution = true;
                         }
                     } else {
                         // Finished execution, so close
