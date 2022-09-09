@@ -19,7 +19,7 @@ bool Karel::move() {
     assert(i >= 0 && i < WORLDSIZE && j >= 0 && j < WORLDSIZE);
 
     static char *const error_msg =
-            "Error: can't move in the direction specified";
+            "Error: can't move in that direction";
 
     pc++;           // Move program counter to next instruction
                     // Doing early cause returning is involved here
