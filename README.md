@@ -54,3 +54,13 @@ The main file to be run is `main.out`. To generate this file, run the following 
 make main.out
 ```
 
+## How to use
+Run the following command to start the program:
+```
+./main.out
+```
+Then type the code you want to run in the terminal and press `EOF`. A window should appear where you will see Karel in the bottom right of a 8x8 board. Press space to make Karel execute the next movement instruction (➡ or ↺). If the program successfully runs without Karel crashing towards any wall, the bottom region of the window shoud show _Karel has executed successfully_. But if Karel moves towards a wall, the bottom region will show _Karel can't move in that direction_. In either case, pressing space again will quit the window (and the program).
+
+Alternatively, you can write your program in a text file and send it to main.out as standard input using `<`. 
+
+Karel also creates a temporary text file containing a custom assembly language for Karel. Whenever space is pressed, Karel executes instructions from this assembly file. By default, the file's name is `temp.krl`. However, you can specifiy a name for the temporary text file by passing the file name as an argument to the command (that is, as `argv[1]`).
