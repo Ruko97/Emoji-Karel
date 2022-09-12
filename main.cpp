@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     Karel karel(instructions);
 
     sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT),
-                            "Karel world");
+                            "Emoji Karel");
     window.setKeyRepeatEnabled(false);
     bool finishedExecution = false;
 
