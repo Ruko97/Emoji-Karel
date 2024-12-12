@@ -434,7 +434,7 @@ void renderText(sf::RenderWindow &window, Karel &karel) {
 
     if (karel.getState() == KarelState::end) {
         text.setFillColor(sf::Color::Green);
-        text.setString("Karel exectured successfully");
+        text.setString("Karel executed successfully");
         window.draw(text);
     }
 }
